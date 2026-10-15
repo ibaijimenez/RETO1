@@ -1,0 +1,63 @@
+/*header*/
+header{
+    background-color: #0B0F12;
+    display:flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    height: 60px;
+}
+/*logo del header*/
+.logo {
+  display: flex;
+  align-items: center;
+}
+
+.logo img {
+  height: 24px;
+  width: auto;
+  display: block;
+}
+/*Buscador central de la aplicacion*/
+.buscador {
+  position: relative; /* Hace de referencia para la posición de la lupa */
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 300px;          /* Ajusta el ancho según lo necesites */
+}
+
+.lupa {
+  position: absolute;        /* Coloca la lupa DENTRO del input */
+  left: 10px;
+  width: 14px;
+  height: 14px;
+}
+
+.buscar {
+  width: 100%;
+  padding: 6px 12px 6px 32px;
+  background-color: white;
+  border: 1px solid #333333;
+  border-radius: 20px;
+  color: black;
+  font-size: 0.8rem;
+}
+
+/*acciones --> foto de usuario y logo de notificaciones*/
+.acciones {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.acciones img {
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+}
+
+.acciones img:hover {
+  opacity: 0.8;
+}
