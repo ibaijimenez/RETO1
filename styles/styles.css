@@ -2,17 +2,28 @@
     margin: 0;
 }
 
-/*header*/
+body{
+  height:100vh;
+  display:grid;
+  grid-template-columns:1fr 5.5fr;
+  grid-template-rows:auto 1fr;
+  grid-template-areas:
+  "header header"
+  "aside main";
+}
+
+/* ==========================================================================
+   ESTILOS DEL HEADER
+   ========================================================================== */
 header{
+    grid-area:header;
     background-color: #0B0F12;
     display:flex;
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    width: 100%;
-    height: 60px;
+    padding:1rem;
 }
-/*logo del header*/
 .logo {
   display: flex;
   align-items: center;
@@ -23,7 +34,6 @@ header{
   width: auto;
   display: block;
 }
-/*Buscador central de la aplicacion*/
 .buscador {
   position: relative; /* Hace de referencia para la posición de la lupa */
   display: flex;
@@ -48,8 +58,6 @@ header{
   color: black;
   font-size: 0.8rem;
 }
-
-/*acciones --> foto de usuario y logo de notificaciones*/
 .acciones {
   display: flex;
   align-items: center;
@@ -64,4 +72,69 @@ header{
 
 .acciones img:hover {
   opacity: 0.8;
+}
+/* ==========================================================================
+   ESTILOS DEL ASIDE
+   ========================================================================== */
+aside {
+    grid-area:aside;
+    background-color: #0B0F12;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 20px 15px;
+    box-sizing: border-box;
+    position: sticky;
+    top: 0;
+}
+.menu {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 10px;
+}
+.menu a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    color: #9CA3AF;
+    text-decoration: none;
+    font-size: 0.9rem;
+    border-radius: 8px;
+    transition: background-color 0.2s, color 0.2s;
+}
+.icono-menu {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+}
+.menu a:hover {
+    background-color: #1A202C;
+    color: #FFFFFF;
+}
+.menu a.activo {
+    background-color: #162A26;
+    color: #00E699;
+    font-weight: bold;
+    border-left: 4px solid #00E699;
+}
+
+.usuario-aside {
+display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #FFFFFF;
+    font-size: 0.9rem;
+    padding-top: 15px;
+    border-top: 1px solid #1A202C;
+    margin-top: auto;
+}
+
+.usuario-aside img {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    object-fit: cover;
+    color:white;
 }
