@@ -1,8 +1,8 @@
 <?php
 require_once __DIR__ . '/BaseController.php';
-require_once __DIR__ . '/../models/XxxxxModel.php';
+require_once __DIR__ . '/../models/AergibideModel.php';
 
-class EmpleadoController extends BaseController {
+class AergibideController extends BaseController {
     
     public function index() {
         

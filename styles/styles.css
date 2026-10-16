@@ -1,3 +1,7 @@
+*{
+    margin: 0;
+}
+
 /*header*/
 header{
     background-color: #0B0F12;
@@ -25,7 +29,7 @@ header{
   display: flex;
   align-items: center;
   width: 100%;
-  max-width: 300px;          /* Ajusta el ancho según lo necesites */
+  max-width: 300px;
 }
 
 .lupa {
@@ -40,7 +44,7 @@ header{
   padding: 6px 12px 6px 32px;
   background-color: white;
   border: 1px solid #333333;
-  border-radius: 20px;
+  border-radius: 10px;
   color: black;
   font-size: 0.8rem;
 }
