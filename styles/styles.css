@@ -138,3 +138,337 @@ display: flex;
     object-fit: cover;
     color:white;
 }
+
+/* ==========================================================================
+   ESTILOS DEL LOG IN
+   ========================================================================== */
+.container_login {
+    width: 100%;
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 40% 60%;
+    grid-template-rows: minmax(100vh, auto);
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+/* FOTO IZQUIERDA */
+
+.fotoLogin {
+    position: relative;
+    min-height: 100vh;
+    overflow: hidden;
+    background-color: #00121C;
+    color: white;
+}
+
+.fotoLogin > img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;        /* mantiene la proporción y recorta lo que sobre */
+    object-position: center;  /* antes tenías "block", que no es un valor válido */
+    display: block;
+}
+
+.contenidoFoto {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    box-sizing: border-box;
+    padding: 55px 10%;
+    display: flex;
+    flex-direction: column;
+}
+
+
+/* FORMULARIO DERECHA */
+
+.iniciarSesion {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+    padding: 40px 11%;
+
+    background-color: white;
+    background-image: url("../img/login/decoracion_login.png");
+    background-size: 100% 100%;     
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.formularioLogin {
+    width: 100%;
+    max-width: 565px;
+}
+
+.bienvenida {
+    color: #00B386;
+    font-size: 19px;
+    font-weight: normal;
+    margin-bottom: 10px;
+}
+
+.formularioLogin h1 {
+    color: #111820;
+    font-size: 34px;
+    margin-bottom: 8px;
+}
+
+.descripcionLogin {
+    color: #777E86;
+    font-size: 16px;
+    line-height: 1.35;
+    margin-bottom: 35px;
+    max-width: 390px;
+}
+
+.formularioLogin form {
+    display: flex;
+    flex-direction: column;
+}
+
+.formularioLogin label {
+    font-size: 16px;
+    font-weight: bold;
+    color: #171B20;
+    margin-bottom: 10px;
+}
+
+.campoLogin {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+    height: 46px;
+    box-sizing: border-box;
+    border: 1px solid #BFC3C7;
+    border-radius: 17px;
+    padding: 0 15px;
+    margin-bottom: 35px;
+    background-color: white;
+}
+
+.campoLogin img {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+.campoLogin input {
+    width: 100%;
+    min-width: 0;
+    border: none;
+    outline: none;
+    font-size: 13px;
+    color: #30363D;
+    background: transparent;
+}
+
+.campoLogin input::placeholder {
+    color: #777E86;
+    font-weight: bold;
+}
+
+.formularioLogin button {
+    width: 100%;
+    height: 53px;
+    border: none;
+    border-radius: 20px;
+    background-color: #00B386;
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 0;
+}
+
+.formularioLogin button:hover {
+    background-color: #009D76;
+}
+
+.separacionLogin {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin: 35px 0;
+}
+
+.registroLogin {
+    text-align: center;
+    color: #777E86;
+    font-size: 15px;
+}
+
+.registrar {
+    color: #00B386;
+    text-decoration: underline;
+}
+
+
+body:has(.container_login) {
+    display: block;
+    height: auto;
+    min-height: 100vh;
+    margin: 0;
+}
+
+
+
+
+
+@media (max-width: 800px) {
+    .container_login {
+        grid-template-columns: 1fr;
+    }
+
+    .fotoLogin {
+        display: none;
+    }
+}
+
+   /* ==========================================================================
+   ESTILOS DE REGISTAR
+   ========================================================================== */
+
+
+/* El body del login ya quita el grid del layout con header/aside.
+   Hay que aplicarlo también a la página de registro:
+   modifica tu regla existente para que quede así: */
+body:has(.container_login),
+body:has(.container_registro) {
+    display: block;
+    height: auto;
+    min-height: 100vh;
+    margin: 0;
+}
+
+.container_registro {
+    width: 100%;
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 38% 62%;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+    background-color: white;
+}
+
+/* IZQUIERDA */
+.fotoRegistro {
+    position: relative;
+    min-height: 100vh;
+    overflow: hidden;
+    background-color: white;
+}
+
+.fotoRegistro > img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: left top; 
+    display: block;
+}
+
+/* DERECHA */
+.registrarse {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+    padding: 40px 8%;
+    background-color: white;
+    background-image: url("../img/registrar/decoracion_registrar.png");
+    background-size: 100% 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+/* Con 6 campos, el margen del login (35px) es demasiado grande */
+.container_registro .campoLogin {
+    margin-bottom: 18px;
+}
+
+.container_registro .formularioLogin label {
+    margin-bottom: 8px;
+}
+
+.container_registro .separacionLogin {
+    margin: 22px 0;
+}
+
+/* Select con flecha propia */
+.campoLogin select {
+    width: 100%;
+    min-width: 0;
+    border: none;
+    outline: none;
+    font-size: 13px;
+    font-weight: bold;
+    color: #777E86;
+    background-color: transparent;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path d='M1 1l5 5 5-5' fill='none' stroke='%23777E86' stroke-width='1.5' stroke-linecap='round'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 4px center;
+}
+
+/* Checkbox de términos */
+.aceptoTerminos {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: normal !important;
+    font-size: 15px !important;
+    color: #777E86 !important;
+    margin-bottom: 18px !important;
+    cursor: pointer;
+}
+
+.aceptoTerminos input {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    cursor: pointer;
+    border: 1px solid #BFC3C7;
+    border-radius: 5px;
+    background-color: white;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.aceptoTerminos input:checked {
+    background-color: #00B386;
+    border-color: #00B386;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path d='M3 8.5l3.2 3.2L13 4.8' fill='none' stroke='white' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+}
+
+.aceptoTerminos input:focus-visible {
+    outline: 2px solid #00B386;
+    outline-offset: 2px;
+}
+
+/* Móvil */
+@media (max-width: 800px) {
+    .container_registro {
+        grid-template-columns: 1fr;
+    }
+
+    .fotoRegistro {
+        display: none;
+    }
+}
+
