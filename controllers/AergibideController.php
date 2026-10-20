@@ -7,7 +7,7 @@ class AergibideController extends BaseController {
     public function index() {
         
     }
-    
+   
     public function show() {
         
     }
@@ -23,4 +23,5 @@ class AergibideController extends BaseController {
     public function destroyAll() {
         
     }
+
 }
