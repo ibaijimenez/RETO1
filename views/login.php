@@ -3,6 +3,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <base href="/RETO1/">
     <title>Aergibide SL - Iniciar sesión</title>
     <link rel="stylesheet" href="styles/styles.css">
 </head>
