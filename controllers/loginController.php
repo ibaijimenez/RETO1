@@ -10,25 +10,26 @@ class loginController extends BaseController {
 
     public function login() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $usuario = $_POST['usuario'] ?? null;
-            $contrasena = $_POST['contrasena'] ?? null;
+            $user = $_POST['usuario'] ?? '';
+            $pass = $_POST['contrasena'] ?? '';
 
-            $user = AergibideModel::comprobarCredenciales($usuario, $contrasena);
+            $usuario = AergibideModel::comprobarCredenciales($user, $pass);
 
-            if ($user) {
-                session_start();
-                $_SESSION['usuario'] = $user;
-                header('Location: views/main.php');
-                exit();
-            } else {
-                $error = "Usuario o contraseña incorrectos";
-                // Limpiamos todo el HTML que el Router haya dibujado antes
-                if (ob_get_length()) {
-                    ob_clean();
-                }
-                require __DIR__ . '/../views/login.php';
-                exit();
+            if ($usuario) {
+                $_SESSION['usuario_id'] = $usuario->id;
+                $_SESSION['nombre']     = $usuario->nombre;
+                header('Location: index.php?controller=AergibideController&accion=inicio');
+                exit;
             }
+
+            $error = "Usuario o contraseña incorrectos";
+            require __DIR__ . '/../views/login.php';
+            exit;
         }
+    }
+    public function logout() {
+        session_destroy();
+        header('Location: index.php');
+        exit;
     }
 }
