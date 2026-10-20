@@ -472,3 +472,210 @@ body:has(.container_registro) {
     }
 }
 
+/* ==========================================================================
+   ESTILOS DE INICIO
+   ========================================================================== */
+
+main.inicio {
+    grid-area: main;
+    padding: 24px 40px 40px;
+    box-sizing: border-box;
+    background-color: white;
+    min-width: 0;
+}
+
+/* ---- Banners ---- */
+.bannerLogo {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 1;      /* mucho más bajo: ~130px en una pantalla grande */
+    object-fit: cover;
+    object-position: center;
+    border-radius: 18px;
+    margin-bottom: 18px;
+}
+
+.bannerHola {
+    min-height: 270px;
+    border-radius: 18px;
+    margin-bottom: 18px;
+    padding: 28px 32px;
+    box-sizing: border-box;
+    color: white;
+    background-color: #050708;
+    background-image: url("../img/main/ventanaAeropuerto.png");
+    background-size: cover;
+    background-position: right center;
+    background-repeat: no-repeat;
+}
+
+.bannerHolaTexto {
+    max-width: 440px;
+}
+
+.bannerHola h2 {
+    font-size: 26px;
+    margin-bottom: 28px;
+}
+
+.bannerHola p {
+    font-size: 15px;
+    line-height: 1.35;
+    font-weight: bold;
+}
+
+.bannerHola .holaPrimera {
+    margin-bottom: 36px;
+}
+
+.manoSaludo {
+    margin-right: 4px;
+}
+
+.bannerVision {
+    display: block;
+    width: 100%;
+    aspect-ratio: 7 / 1;       /* ~290px en una pantalla grande */
+    object-fit: cover;
+    object-position: center;
+    border-radius: 18px;
+    margin-bottom: 40px;
+}
+
+.bannerVision img {
+    align-self: stretch;
+    width: 320px;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.bannerVision h2 {
+    font-size: 26px;
+    font-weight: normal;
+    margin-bottom: 8px;
+}
+
+.bannerVision p {
+    font-size: 17px;
+    line-height: 1.3;
+    padding-right: 30px;
+}
+
+/* ---- Columnas ---- */
+.inicioColumnas {
+    display: grid;
+    grid-template-columns: minmax(0, 2.2fr) minmax(0, 1fr);
+    column-gap: 60px;
+}
+
+.tituloSeccion {
+    color: #00A67E;
+    font-size: 26px;
+    text-align: center;
+    margin-bottom: 8px;
+}
+
+.etiquetaTipo {
+    display: block;
+    color: #9CA3AF;
+    font-size: 15px;
+    margin: 14px 0 4px 6px;
+}
+
+/* ---- Tarjeta de pregunta ---- */
+.tarjetaPregunta {
+    background-color: white;
+    border-radius: 30px;
+    padding: 22px 28px 18px;
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.18);
+}
+
+.tarjetaCabecera {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+}
+
+.tarjetaCabecera h3 {
+    font-size: 24px;
+    line-height: 1.2;
+    color: #111820;
+}
+
+.iconoGuardar {
+    flex-shrink: 0;
+    margin-top: 4px;
+}
+
+.etiquetas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin: 18px 0 22px;
+}
+
+.etiqueta {
+    background-color: #E4EAF6;
+    color: #111820;
+    font-size: 20px;
+    font-weight: bold;
+    padding: 8px 26px;
+    border-radius: 20px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.25);
+}
+
+.tarjetaPie {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 22px 40px;
+    color: #111820;
+    font-size: 15px;
+}
+
+.datoPie {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.avatarMini {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* ---- Usuarios destacados ---- */
+.usuarioDestacado {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    margin-top: 30px;
+}
+
+.usuarioDestacado img {
+    width: 170px;
+    height: 170px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.usuarioDestacado span {
+    font-size: 22px;
+    font-weight: bold;
+    color: #111820;
+}
+
+/* ---- Pantallas pequeñas ---- */
+@media (max-width: 1100px) {
+    .inicioColumnas {
+        grid-template-columns: 1fr;
+    }
+
+    .bannerVision img {
+        display: none;
+    }
+}
