@@ -1,4 +1,7 @@
-*{
+/*Para la fuente de letra:*/
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Source+Sans+3:wght@400;600;700&display=swap');
+ 
+ *{
     margin: 0;
 }
 
@@ -11,134 +14,153 @@ body{
   "header header"
   "aside main";
 }
+/* ==========================================================================
+   HEADER Y SIDEBAR FIJOS (solo se mueve el main)
+   ========================================================================== */
+body:has(main.inicio) {
+    height: 100vh;
+    overflow: hidden;                          /* la página en sí no hace scroll */
+    grid-template-rows: auto minmax(0, 1fr);   /* la fila del main puede encogerse */
+}
 
+main.inicio {
+    overflow-y: auto;                          /* el scroll ocurre aquí dentro */
+    min-height: 0;
+}
+
+aside {
+    min-height: 0;
+    overflow-y: auto;                          /* por si el menú crece en pantallas bajas */
+}
 /* ==========================================================================
    ESTILOS DEL HEADER
    ========================================================================== */
-header{
-    grid-area:header;
+header {
+    grid-area: header;
     background-color: #0B0F12;
-    display:flex;
-    flex-direction: row;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;   /* izquierda | centro | derecha */
     align-items: center;
-    justify-content: space-between;
-    padding:1rem;
+    padding: 1rem;
 }
+
+/* Izquierda: logo de AERGIBIDE */
 .logo {
-  display: flex;
-  align-items: center;
+    display: flex;
+    align-items: center;
+    justify-self: start;
 }
 
 .logo img {
-  height: 24px;
-  width: auto;
-  display: block;
-}
-.buscador {
-  position: relative; /* Hace de referencia para la posición de la lupa */
-  display: flex;
-  align-items: center;
-  width: 100%;
-  max-width: 300px;
+    height: 24px;
+    width: auto;
+    display: block;
 }
 
-.lupa {
-  position: absolute;        /* Coloca la lupa DENTRO del input */
-  left: 10px;
-  width: 14px;
-  height: 14px;
+/* Centro: logotipo verde */
+.logoCentro {
+    display: flex;
+    justify-content: center;
 }
 
-.buscar {
-  width: 100%;
-  padding: 6px 12px 6px 32px;
-  background-color: white;
-  border: 1px solid #333333;
-  border-radius: 10px;
-  color: black;
-  font-size: 0.8rem;
+.logoCentro img {
+    height: 40px;
+    width: auto;
+    display: block;
 }
+
+/* Derecha: campana, perfil y salir */
 .acciones {
-  display: flex;
-  align-items: center;
-  gap: 15px;
+    display: flex;
+    align-items: center;
+    justify-self: end;
+    gap: 12px;
 }
 
 .acciones img {
-  width: 40px;
-  height: 40px;
-  cursor: pointer;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
 }
 
 .acciones img:hover {
-  opacity: 0.8;
+    opacity: 0.8;
+}
+
+.btnSalir {
+    display: flex;
 }
 /* ==========================================================================
    ESTILOS DEL ASIDE
    ========================================================================== */
 aside {
-    grid-area:aside;
+    grid-area: aside;
     background-color: #0B0F12;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    padding: 20px 15px;
+    padding: 24px 16px;
     box-sizing: border-box;
-    position: sticky;
-    top: 0;
 }
+
 .menu {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    margin-top: 10px;
+    gap: 18px;
+    margin-top: 8px;
 }
+
 .menu a {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 10px 14px;
-    color: #9CA3AF;
+    gap: 16px;
+    padding: 12px 16px;
+    color: #E5E7EB;
     text-decoration: none;
-    font-size: 0.9rem;
-    border-radius: 8px;
+    font-size: 1.15rem;
+    border-radius: 10px;
+    border-left: 4px solid transparent;   /* reserva el hueco para que no "salte" al activarse */
     transition: background-color 0.2s, color 0.2s;
 }
+
 .icono-menu {
-    width: 20px;
-    height: 20px;
+    width: 24px;
+    height: 24px;
     object-fit: contain;
+    flex-shrink: 0;
 }
+
 .menu a:hover {
     background-color: #1A202C;
     color: #FFFFFF;
 }
+
 .menu a.activo {
     background-color: #162A26;
-    color: #00E699;
+    color: #00B386;
     font-weight: bold;
-    border-left: 4px solid #00E699;
+    border-left-color: #00B386;
 }
 
+/* Usuario de abajo */
 .usuario-aside {
-display: flex;
+    display: flex;
     align-items: center;
-    gap: 10px;
+    justify-content: center;   /* <-- centra avatar + nombre horizontalmente */
+    gap: 14px;
     color: #FFFFFF;
-    font-size: 0.9rem;
-    padding-top: 15px;
+    font-size: 1.1rem;
+    padding: 18px 16px 0;
     border-top: 1px solid #1A202C;
     margin-top: auto;
 }
 
 .usuario-aside img {
-    width: 35px;
-    height: 35px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     object-fit: cover;
-    color:white;
 }
-
 /* ==========================================================================
    ESTILOS DEL LOG IN
    ========================================================================== */
@@ -603,10 +625,6 @@ main.inicio {
     color: #111820;
 }
 
-.iconoGuardar {
-    flex-shrink: 0;
-    margin-top: 4px;
-}
 
 .etiquetas {
     display: flex;
@@ -678,4 +696,59 @@ main.inicio {
     .bannerVision img {
         display: none;
     }
+}
+
+/* Botones de like y guardar */
+.btnToggle {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+.btnToggle img   { display: block; }
+.btnGuardar img  { 
+    width: 28px;
+    height: 34px;
+    object-fit: contain; 
+}
+.btnLike img     { width: 32px; height: auto; }
+.iconoCalendario { width: 30px; height: auto; }
+
+.btnToggle:focus-visible {
+    outline: 2px solid #00A67E;
+    outline-offset: 3px;
+}
+ 
+/* ==========================================================================
+   FUENTES DE LA WEB
+   ========================================================================== */
+:root {
+    --fuente-titulo: 'Montserrat', Arial, sans-serif;       /* títulos fuertes */
+    --fuente-texto:  'Source Sans 3', Arial, sans-serif;    /* texto normal */
+}
+ 
+/* Texto normal: todo lo que no se indique abajo */
+body,
+.container_login,
+.container_registro,
+main.inicio,
+input,
+select,
+button {
+    font-family: var(--fuente-texto);
+}
+ 
+/* Títulos fuertes: Montserrat Bold */
+h1,
+h2,
+h3,
+.tituloSeccion,
+.etiqueta,
+.usuarioDestacado span,
+.formularioLogin button {
+    font-family: var(--fuente-titulo);
+    font-weight: 700;
 }
