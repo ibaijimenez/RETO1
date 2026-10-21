@@ -12,6 +12,20 @@ class AergibideModel {
     }
     
     public static function create($datos) {
+        $db = Database::getConnection();
+
+        $sql = "INSERT INTO usuarios (nombre, apellidos, correo, passwd, departamento) 
+            VALUES (:nombre, :apellidos, :correo, :contrasena, :departamento)";
+
+        $stmt = $db->prepare($sql);
+
+        return $stmt->execute([
+            ':nombre'       => $datos['nombre'],
+            ':apellidos'    => $datos['apellidos'],
+            ':correo'       => $datos['correo'],
+            ':contrasena'   => $datos['contraseña'], 
+            ':departamento' => $datos['departamento']
+        ]);
         
     }
     
@@ -21,5 +35,68 @@ class AergibideModel {
     
     public static function deleteAll() {
         
+    }
+
+    public static function comprobarCredenciales($usuario, $contrasena) {
+        $datos = [
+            "usuario" => $usuario,
+            "contrasena" => $contrasena
+        ];
+        $db = Database::getConnection();
+        $stmt=$db -> prepare("SELECT * FROM usuarios where  nombre=:usuario AND passwd=:contrasena ");
+        $stmt->execute($datos); 
+        return $stmt->fetch(); 
+    }
+
+    public static function getPreguntas(int $usuarioId, string $filtro = 'todas', string $busqueda = '', string $orden = 'recientes'): array
+    {
+        // Lista blanca de ordenaciones (evita inyección SQL)
+        $ordenes = [
+            'recientes'  => 'p.fecha_creacion DESC',
+            'likes'      => 'likes DESC',
+            'respuestas' => 'respuestas DESC',
+        ];
+        $orderBy = $ordenes[$orden] ?? $ordenes['recientes'];
+
+        $sql = "
+            SELECT p.id, p.titulo, p.fecha_creacion,
+                u.nombre AS autor,
+                (SELECT GROUP_CONCAT(t.nombre ORDER BY t.nombre SEPARATOR '||')
+                    FROM pregunta_temas pt
+                    JOIN temas t ON t.id = pt.tema_id
+                    WHERE pt.pregunta_id = p.id) AS temas,
+                (SELECT COUNT(*) FROM respuestas r WHERE r.pregunta_id = p.id) AS respuestas,
+                (SELECT COUNT(*) FROM pregunta_likes l WHERE l.pregunta_id = p.id) AS likes,
+                EXISTS(SELECT 1 FROM pregunta_likes l2
+                        WHERE l2.pregunta_id = p.id AND l2.usuario_id = :uid_like) AS me_gusta,
+                EXISTS(SELECT 1 FROM preguntas_guardadas g
+                        WHERE g.pregunta_id = p.id AND g.usuario_id = :uid_guard) AS guardada
+            FROM preguntas p
+            JOIN usuarios u ON u.id = p.usuario_id
+            WHERE 1 = 1
+        ";
+        $params = [':uid_like' => $usuarioId, ':uid_guard' => $usuarioId];
+
+        if ($filtro === 'mias') {
+            $sql .= " AND p.usuario_id = :uid_mias";
+            $params[':uid_mias'] = $usuarioId;
+        }
+
+        if ($busqueda !== '') {
+            $sql .= " AND (p.titulo LIKE :q1
+                    OR u.nombre LIKE :q2
+                    OR EXISTS (SELECT 1 FROM pregunta_temas pt2
+                                    JOIN temas t2 ON t2.id = pt2.tema_id
+                                WHERE pt2.pregunta_id = p.id AND t2.nombre LIKE :q3))";
+            $like = '%' . $busqueda . '%';
+            $params[':q1'] = $params[':q2'] = $params[':q3'] = $like;
+        }
+
+        $sql .= " ORDER BY $orderBy";
+
+        $db   = Database::getConnection();
+        $stmt = $db->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);   // array asociativo, como usa la vista
     }
 }
