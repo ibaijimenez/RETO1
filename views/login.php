@@ -59,7 +59,9 @@
 
                 <p class="registroLogin">
                     ¿No tienes cuenta?
-                    <a href="views/registrar.php" class="registrar">Regístrate</a>
+
+                    <a href="index.php?controller=registrarController&accion=index" class="registrar">Regístrate</a>
+
 
             </div>
         </div>
