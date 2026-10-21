@@ -37,20 +37,20 @@
                     </p>
                 <?php endif; ?>
 
-                <form action="index.php?controller=registrarController&accion=registrar" method="POST">
+                <form action="index.php?controller=registroController&accion=registrar" method="POST">
 
                     <label for="nombre">Nombre</label>
                     <div class="campoLogin">
                         <img src="img/registrar/perfil.png" alt="">
                         <input type="text" id="nombre" name="nombre"
-                               placeholder="Tu nombre" required>
+                                placeholder="Tu nombre" value="<?= htmlspecialchars($nombre ?? ''); ?>" required>
                     </div>
 
                     <label for="apellidos">Apellidos</label>
                     <div class="campoLogin">
                         <img src="img/registrar/perfil.png" alt="">
                         <input type="text" id="apellidos" name="apellidos"
-                               placeholder="Tus apellidos" required>
+                               placeholder="tu@gmail.com" value="<?= htmlspecialchars($correo ?? ''); ?>" required>
                     </div>
 
                     <label for="correo">Correo electrónico</label>
@@ -103,7 +103,7 @@
 
                 <p class="registroLogin">
                     ¿Ya tienes cuenta?
-                    <a href="index.php?controller=loginController&accion=index" class="regigit branchstrar">Inicia sesión</a>
+                    <a href="index.php?controller=loginController&accion=index" class="registrar">Inicia sesión</a>
                 </p>
 
             </div>
