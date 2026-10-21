@@ -2,7 +2,7 @@
     $pagina_activa = 'usuario';
 
     // para pestaña seleccionada
-    $pestaña = $_GET['pestaña'] ?? 'preguntas';
+    $pestana = $_GET['pestana'] ?? 'preguntas';
 
     // apartado informacion usuario
     $usuario = [
@@ -46,7 +46,7 @@
         ]
     ];
 
-
+    // apartado de preguntas guardadas del usuario
     $preguntas_guardadas = [
         [
             'titulo'    => '¿Cómo mejorar la precisión de los sensores de temperatura en ensayos de laboratorio?',
@@ -85,74 +85,154 @@
 
 <main class="perfil">
 
+    <!-- cabecera de la pagina  (foto perfil, nombre, contador de guardados y preguntas) -->
     <section class="cabecera-perfil">
-        <!-- foto de perfil y nombre -->
         <div class="foto">
-            <img src="img/aside/logo_usuarios.png" alt="Avatar de <?= $usuario['nombre']; ?>">
+            <img src="img/aside/logo_usuarios.png" alt="Avatar de <?= ($usuario['nombre']); ?>">
         </div>
-        <h1 class="nombreUser"><?= $usuario['nombre']; ?></h1><!-- nombre de la foto de perfil -->
+        <h1 class="nombreUser"><?= $usuario['nombre']; ?></h1>
+
 
         <div class="datosContador">
             <div class="dato">
-                <span class="numero"><?= (int)$usuario['total_preguntas']; ?></span>
+                <span class="numero"><?= count($mis_preguntas); ?></span>
                 <span class="label">Preguntas</span>
             </div>
             <div class="dato">
-                <span class="numero"><?= (int)$usuario['total_favoritos']; ?></span>
+                <span class="numero"><?= count($preguntas_guardadas); ?></span>
                 <span class="label">Favoritos</span>
             </div>
         </div>
 
-        <!-- apartado preguntas guardados informacion del usuario -->
+        <!-- los tres apartados -->
         <div class="apartados">
-            <a href="#" class="apartado1">Preguntas</a>
-            <a href="#" class="apartado2">Guardados</a>
-            <a href="#" class="apartado3">Información</a>
+            <button type="button" class="pestana-btn activa" onclick="cambiarPestana('preguntas', this)">Preguntas</button>
+            <button type="button" class="pestana-btn" onclick="cambiarPestana('guardados', this)">Guardados</button>
+            <button type="button" class="pestana-btn" onclick="cambiarPestana('informacion', this)">Información</button>
         </div>
     </section>
 
-    <!-- las preguntas -->
     <div class="listaPreguntas">
-        <?php foreach ($preguntas_guardadas as $p): ?>
-            <article class="tarjetaPregunta">
-
-                <div class="tarjetaCabecera">
-                    <h3><?= $p['titulo']; ?></h3>
-
-                    <button type="button" class="btnGuardar" data-tipo="guardar" >
-                        <img src="<?= $img; ?>guardadoConRelleno.png" alt="Guardada">
-                    </button>
-                </div>
-
-                <div class="etiquetas">
-                    <?php foreach ($p['etiquetas'] as $etiqueta): ?>
-                        <span class="etiqueta"><?= $etiqueta; ?></span>
-                    <?php endforeach; ?>
-                </div>
-                    
-                <!-- informacion de abajo de las preguntas, quien la ha echo, los likes, la fecha -->
-                <div class="infoPregunta">
-                    <div class="autorPregunta">
-                        <img class="perfilPequeño" src="<?= $img; ?>iconoPerfil.png" alt="">
-                        <span><?= $p['autor']; ?></span>
+        <!-- pestaña preguntas usuario activa -->
+        <div id="preguntas" class="seccionPestana">
+            <?php foreach ($mis_preguntas as $p): ?>
+                <article class="tarjetaPregunta">
+                    <div class="tarjetaCabecera">
+                        <h3><?=$p['titulo']; ?></h3>
                     </div>
 
-                    <div class="likePregunta">
-                        <button type="button" class="btnToggle btnLike" data-tipo="like" >
-                            <img src="<?= $img; ?>coraSinRelleno.png" alt="">
+                    <div class="etiquetas">
+                        <?php foreach ($p['etiquetas'] as $etiqueta): ?>
+                            <span class="etiqueta"><?= $etiqueta; ?></span>
+                        <?php endforeach; ?>
+                    </div>
+
+                    <div class="infoPregunta">
+                        <div class="respuestasPregunta">
+                            <img class="iconoInfo" src="<?= $img; ?>iconoPregunta.png" alt="">
+                            <span><?= $p['respuestas']; ?> respuestas</span>
+                        </div>
+
+                        <div class="likePregunta">
+                            <img class="iconoInfo" src="<?= $img; ?>coraSinRelleno.png" alt="">
+                            <span><?= $p['likes']; ?> likes</span>
+                        </div>
+
+                        <div class="fechaPregunta">
+                            <img class="iconoInfo" src="<?= $img; ?>calendario 1.png" alt="">
+                            <span><?= $p['fecha']; ?></span>
+                        </div>
+
+                        
+                        <div class="eliminarPregunta">
+                            <button type="button" class="btnEliminar">
+                                <img src="<?= $img; ?>papelera.png" alt="Eliminar">
+                            </button>
+                        </div>
+                    </div>
+                </article>
+            
+
+        <div id="guardados" class="seccionPestana" style="display: none;">
+            <?php foreach ($preguntas_guardadas as $p): ?>
+                <article class="tarjetaPregunta">
+                    <div class="tarjetaCabecera">
+                        <h3><?= $p['titulo']; ?></h3>
+                        <button type="button" class="btnGuardar">
+                            <img src="<?= $img; ?>guardadoVerde.png" alt="Guardada">
                         </button>
-                        <span><span class="numLikes"><?= (int)$p['likes']; ?></span> likes</span>
                     </div>
 
-                    <div class="fechaPregunta">
-                        <img class="iconoCalendario" src="<?= $img; ?>calendario 1.png" alt="">
-                        <span><?= $p['fecha']; ?></span>
+                    <div class="etiquetas">
+                        <?php foreach ($p['etiquetas'] as $etiqueta): ?>
+                            <span class="etiqueta"><?= $etiqueta; ?></span>
+                        <?php endforeach; ?>
+                    </div>
+
+                    <div class="infoPregunta">
+                        <div class="autorPregunta">
+                            <img class="perfilPequeño" src="<?= $img; ?>iconoPerfil.png" alt="">
+                            <span><?= $p['autor']; ?></span>
+                        </div>
+
+                        <div class="likePregunta">
+                            <img class="iconoInfo" src="<?= $img; ?>coraSinRelleno.png" alt="">
+                            <span><?= $p['likes']; ?> likes</span>
+                        </div>
+
+                        <div class="fechaPregunta">
+                            <img class="iconoInfo" src="<?= $img; ?>calendario 1.png" alt="">
+                            <span><?= $p['fecha']; ?></span>
+                        </div>
+                    </div>
+                </article>
+            
+
+        <div id="informacion" class="seccionPestana" style="display: none;">
+            <div class="formInformacion">
+                <div class="campoInfo">
+                    <label>Nombre y Apellidos:</label>
+                    <div class="container">
+                        <input type="text" value="<?= $usuario['nombre']; ?>">
+                        <button type="button" class="btnGuardar"><img src="<?= $img; ?>iconoGuardar.png" alt="Guardar"></button>
                     </div>
                 </div>
 
-            </article>
-        <?php endforeach; ?>
-    </section>
+                <div class="campoInfo">
+                    <label>Puesto:</label>
+                    <div class="container">
+                        <input type="text" value="<?= $usuario['puesto']; ?>">
+                        <button type="button" class="btnGuardar"><img src="<?= $img; ?>iconoGuardar.png" alt="Guardar"></button>
+                    </div>
+                </div>
+
+                <div class="campoInfo">
+                    <label>Departamento:</label>
+                    <div class="container">
+                        <input type="text" value="<?= $usuario['departamento']; ?>">
+                        <button type="button" class="btnGuardar"><img src="<?= $img; ?>iconoGuardar.png" alt="Guardar"></button>
+                    </div>
+                </div>
+
+                <div class="campoInfo">
+                    <label>Ubicación:</label>
+                    <div class="container">
+                        <input type="text" value="<?= $usuario['ubicacion']; ?>">
+                        <button type="button" class="btnGuardar"><img src="<?= $img; ?>iconoGuardar.png" alt="Guardar"></button>
+                    </div>
+                </div>
+
+                <div class="campoInfo">
+                    <label>Email:</label>
+                    <div class="container">
+                        <input type="text" value="<?= $usuario['email']; ?>">
+                        <button type="button" class="btnGuardar"><img src="<?= $img; ?>iconoGuardar.png" alt="Guardar"></button>
+                    </div>
+                </div>
+            </div>
+        
+
+    </div>
 
 </main>
 
