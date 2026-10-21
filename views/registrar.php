@@ -30,7 +30,14 @@
                     plataforma.
                 </p>
 
-                <form action="index.php?controller=registrarController&action=registrar" method="POST">
+                <!-- para ostrar error en caso de detercat un error -->
+                <?php if (!empty($error)): ?>
+                    <p style="color: red; font-weight: bold; text-align: center; background-color: #ffe6e6; padding: 10px; border-radius: 5px;">
+                        <?= $error; ?>
+                    </p>
+                <?php endif; ?>
+
+                <form action="index.php?controller=registrarController&accion=registrar" method="POST">
 
                     <label for="nombre">Nombre</label>
                     <div class="campoLogin">
