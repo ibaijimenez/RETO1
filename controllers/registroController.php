@@ -2,7 +2,7 @@
 require_once __DIR__ . '/BaseController.php';
 require_once __DIR__ . '/../models/AergibideModel.php';
 
-class registrarController extends BaseController {
+class registroController extends BaseController {
 
     public function index() {
         require __DIR__ . '/../views/registrar.php';
@@ -10,7 +10,7 @@ class registrarController extends BaseController {
 
     public function registrar() {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->redirect('index.php?controller=registrarController&accion=index');
+            $this->redirect('index.php?controller=registroController&accion=index');
         }
 
         $nombre       = trim($_POST['nombre'] ?? '');
