@@ -29,3 +29,17 @@ document.querySelectorAll('.btnToggle').forEach(function (boton) {
         }
     });
 });
+
+
+document.addEventListener('click', function (e) {
+    var boton = e.target.closest('.btnLike');
+    if (!boton) return;
+
+    var datos = new FormData();
+    datos.append('pregunta_id', boton.dataset.id);
+
+    fetch('index.php?controller=AergibideController&accion=like', {
+        method: 'POST',
+        body: datos
+    });
+});

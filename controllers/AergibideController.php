@@ -33,4 +33,16 @@ class AergibideController extends BaseController {
         $preguntasMasLikes = Pregunta::getPreguntasMasLikes();
         require_once 'views/main.php'; 
     }
+
+    public function like() {
+    if (!isset($_SESSION['usuario_id'])) {
+        exit;
+    }
+
+    $preguntaId = (int) ($_POST['pregunta_id'] ?? 0);
+
+    if ($preguntaId > 0) {
+        AergibideModel::toggleLike((int) $_SESSION['usuario_id'], $preguntaId);
+    }
+}
 }

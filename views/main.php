@@ -85,6 +85,7 @@ require __DIR__ . '/layout/sidebar.php';
 
                         <div class="datoPie">
                             <button type="button" class="btnToggle btnLike" data-tipo="like"
+                                    data-id="<?= (int)$p['id']; ?>"
                                     aria-pressed="<?= $p['me_gusta'] ? 'true' : 'false'; ?>" aria-label="Me gusta">
                                 <img src="<?= $img . ($p['me_gusta'] ? 'coraConRelleno.png' : 'coraSinRelleno.png'); ?>" alt="">
                             </button>
