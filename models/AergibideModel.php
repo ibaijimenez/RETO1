@@ -85,4 +85,30 @@ class AergibideModel {
         $stmt->execute($params);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);   // array asociativo, como usa la vista
     }
+    public static function getPreguntasMasLikes(?int $limite = null): array
+    {
+        $sql = "
+            SELECT 
+                p.id, 
+                p.titulo, 
+                p.fecha_creacion,
+                u.nombre AS autor,
+                COUNT(l.id) AS likes
+            FROM preguntas p
+            JOIN usuarios u ON u.id = p.usuario_id
+            LEFT JOIN pregunta_likes l ON l.pregunta_id = p.id
+            GROUP BY p.id
+            ORDER BY likes DESC
+        ";
+
+        if ($limite !== null && $limite > 0) {
+            $sql .= " LIMIT " . (int)$limite;
+        }
+
+        $db   = Database::getConnection();
+        $stmt = $db->prepare($sql);
+        $stmt->execute();
+        
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }
