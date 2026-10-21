@@ -95,7 +95,7 @@
 
                 <p class="registroLogin">
                     ¿Ya tienes cuenta?
-                    <a href="index.php?pagina=login" class="registrar">Inicia sesión</a>
+                    <a href="index.php?pagina=login" class="regigit branchstrar">Inicia sesión</a>
                 </p>
 
             </div>
