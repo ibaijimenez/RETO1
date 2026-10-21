@@ -14,11 +14,11 @@ require __DIR__ . '/layout/sidebar.php';
             <h1>Preguntas</h1>
             <p class="subtituloPreguntas">Aquí puedes consultar todas las preguntas de la comunidad.</p>
         </div>
-        <a href="#" class="btnNuevaPregunta">+ Nueva pregunta</a>
+        <a href="index.php?controller=PreguntasController&accion=nuevaPregunta" class="btnNuevaPregunta">+ Nueva pregunta</a>
     </div>
 
     <form method="GET" action="index.php">
-        <input type="hidden" name="controller" value="AergibideController">
+        <input type="hidden" name="controller" value="PreguntasController">
         <input type="hidden" name="accion" value="preguntas">
         <input type="hidden" name="filtro" value="<?= htmlspecialchars($filtro); ?>">
 
@@ -29,9 +29,9 @@ require __DIR__ . '/layout/sidebar.php';
 
         <div class="filtros">
             <div class="filtrosBotones">
-                <a href="index.php?controller=AergibideController&accion=preguntas&filtro=todas"
+                <a href="index.php?controller=PreguntasController&accion=preguntas&filtro=todas"
                 class="pill <?= $filtro === 'todas' ? 'pillActiva' : ''; ?>">TODAS</a>
-                <a href="index.php?controller=AergibideController&accion=preguntas&filtro=mias"
+                <a href="index.php?controller=PreguntasController&accion=preguntas&filtro=mias"
                 class="pill <?= $filtro === 'mias' ? 'pillActiva' : ''; ?>">MIS PREGUNTAS</a>
             </div>
 

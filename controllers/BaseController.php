@@ -18,4 +18,12 @@ class BaseController {
         header("Location: {$url}");
         exit;
     }
+    
+    // Si no hay sesión iniciada, vuelve al login
+    protected function comprobarSesion() {
+        if (!isset($_SESSION['usuario_id'])) {
+            header('Location: index.php');
+            exit;
+        }
+    }
 }

@@ -869,3 +869,166 @@ h3,
     .cajaRespuestas { height: auto; flex-direction: row; padding: 12px; }
     .cabeceraPreguntas { flex-direction: column; }
 }
+
+/* ==========================================================================
+   ESTILOS DE NUEVA PREGUNTA  
+   ========================================================================== */
+
+/* Migas de pan: Preguntas / Nueva pregunta */
+.migas {
+    display: flex;
+    gap: 12px;
+    font-size: 22px;
+    color: #4B5563;
+    margin-bottom: 14px;
+}
+
+.migas a {
+    color: #00B386;
+    text-decoration: none;
+}
+
+.migas a:hover {
+    text-decoration: underline;
+}
+
+main.nuevaPregunta h1 {
+    font-size: 48px;
+    color: #000;
+    margin-bottom: 6px;
+}
+
+/* Tarjeta del formulario */
+.formPregunta {
+    margin-top: 26px;
+    padding: 30px 28px 26px;
+    background-color: white;
+    border: 1px solid #BFC3C7;
+    border-radius: 22px;
+}
+
+.formPregunta label {
+    display: block;
+    font-family: var(--fuente-texto);
+    font-weight: 700;
+    font-size: 22px;
+    color: #111820;
+    margin-bottom: 10px;
+}
+
+.obligatorio {
+    color: #E00000;
+}
+
+.formPregunta input[type="text"],
+.formPregunta textarea {
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid #BFC3C7;
+    border-radius: 12px;
+    padding: 13px 18px;
+    font-family: var(--fuente-texto);
+    font-size: 20px;
+    color: #30363D;
+    background-color: white;
+    outline: none;
+    margin-bottom: 28px;
+}
+
+.formPregunta textarea {
+    min-height: 230px;
+    resize: vertical;
+}
+
+.formPregunta input[type="text"]:focus,
+.formPregunta textarea:focus {
+    border-color: #00B386;
+}
+
+.formPregunta ::placeholder {
+    color: #777E86;
+}
+
+/* Etiquetas con icono dentro del campo */
+.campoEtiquetas {
+    position: relative;
+}
+
+.campoEtiquetas svg {
+    position: absolute;
+    left: 16px;
+    top: 14px;
+}
+
+.campoEtiquetas input[type="text"] {
+    padding-left: 58px;
+    margin-bottom: 8px;
+}
+
+.ayudaForm {
+    color: #777E86;
+    font-size: 17px;
+    margin-bottom: 30px;
+}
+
+/* Errores de validación */
+.erroresForm {
+    background-color: #FDECEC;
+    border: 1px solid #F5B5B5;
+    color: #9B1C1C;
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin-bottom: 24px;
+    font-size: 18px;
+}
+
+/* Pie: aviso + botones */
+.pieForm {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.avisoForm {
+    color: #777E86;
+    font-size: 22px;
+}
+
+.botonesForm {
+    display: flex;
+    gap: 22px;
+}
+
+.btnCancelar {
+    border: 1px solid #111820;
+    border-radius: 12px;
+    padding: 12px 28px;
+    font-size: 24px;
+    color: #111820;
+    text-decoration: none;
+    background-color: white;
+}
+
+.btnCancelar:hover {
+    background-color: #F3F4F6;
+}
+
+.btnPublicar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background-color: #00B386;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 12px 30px;
+    font-family: var(--fuente-texto);
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.btnPublicar:hover {
+    background-color: #009D76;
+}
