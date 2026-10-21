@@ -32,7 +32,7 @@
                 <!-- para ostrar error en caso de detercat un error -->
                 <?php if (!empty($error)): ?>
                     <p style="color: red; font-weight: bold; text-align: center; background-color: #ffe6e6; padding: 10px; border-radius: 5px;">
-                        <?= $error; ?>
+                        <?= htmlspecialchars($error); ?>
                     </p>
                 <?php endif; ?>
 
@@ -102,7 +102,7 @@
 
                 <p class="registroLogin">
                     ¿Ya tienes cuenta?
-                    <a href="index.php?pagina=login" class="regigit branchstrar">Inicia sesión</a>
+                    <a href="index.php?controller=loginController&accion=index" class="regigit branchstrar">Inicia sesión</a>
                 </p>
 
             </div>
