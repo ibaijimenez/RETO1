@@ -52,7 +52,7 @@ require __DIR__ . '/layout/sidebar.php';
         <div class="filaPregunta">
 
             <div class="cajaRespuestas">
-                <img src="img/aside/preguntas_blanco.png" alt="">
+                <img src="img/preguntas/preguntas_blanco.png" alt="">
                 <span><?= (int)($p['respuestas'] ?? 0); ?> respuestas</span>
             </div>
 
