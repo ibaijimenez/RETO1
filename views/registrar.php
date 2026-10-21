@@ -29,7 +29,7 @@
                     plataforma.
                 </p>
 
-                <form action="#" method="POST">
+                <form action="index.php?controller=registrarController&action=registrar" method="POST">
 
                     <label for="nombre">Nombre</label>
                     <div class="campoLogin">
@@ -86,7 +86,7 @@
                         </span>
                     </label>
 
-                    <button type="submit">CREAR CUENTA</button>
+                    <button type="submit" id="btnCrearCuenta">CREAR CUENTA</button>
 
                 </form>
 
