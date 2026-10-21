@@ -49,16 +49,17 @@ require __DIR__ . '/layout/sidebar.php';
     <?php endif; ?>
 
     <?php foreach ($preguntas as $p): ?>
+        <?php $urlDetalle = 'index.php?controller=PreguntasController&accion=detalle&id=' . (int)$p['id']; ?>
         <div class="filaPregunta">
 
-            <div class="cajaRespuestas">
+            <a class="cajaRespuestas" href="<?= $urlDetalle; ?>">
                 <img src="img/preguntas/preguntas_blanco.png" alt="">
                 <span><?= (int)($p['respuestas'] ?? 0); ?> respuestas</span>
-            </div>
+            </a>
 
             <article class="tarjetaPregunta">
                 <div class="tarjetaCabecera">
-                    <h3><?= htmlspecialchars($p['titulo']); ?></h3>
+                    <h3><a href="<?= $urlDetalle; ?>"><?= htmlspecialchars($p['titulo']); ?></a></h3>
                     <button type="button" class="btnToggle btnGuardar" data-tipo="guardar"
                             data-id="<?= (int)$p['id']; ?>"
                             aria-pressed="<?= !empty($p['guardada']) ? 'true' : 'false'; ?>" aria-label="Guardar pregunta">
