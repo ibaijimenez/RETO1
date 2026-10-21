@@ -24,7 +24,7 @@ class AergibideModel {
             ':nombre'       => $datos['nombre'],
             ':apellidos'    => $datos['apellidos'],
             ':correo'       => $datos['correo'],
-            ':contrasena'   => ':passwd' => $datos['contrasena'],, 
+            ':contrasena'   => $datos['contrasena'],
             ':departamento' => $datos['departamento']
         ]);
 
@@ -33,8 +33,8 @@ class AergibideModel {
     // comprobar si existe correo ya registrado
     public static function existeCorreo($correo) {
         $db = Database::getConnection();
-        $stmt = $db->prepare("SELECT 1 FROM usuarios WHERE correo = c");
-        $stmt->execute(['c' => $correo]);
+        $stmt = $db->prepare("SELECT 1 FROM usuarios WHERE correo = :c");
+        $stmt->execute([':c' => $correo]);
         return (bool) $stmt->fetch();
     }
 
