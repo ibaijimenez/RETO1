@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <base href="/RETO1/">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Aergibide SL</title>
     <link rel="stylesheet" href="styles/styles.css">
@@ -10,9 +11,9 @@
     <header class="header">
 
         <div class="logo">
-            <a href="index.php?pagina=inicio" class="logo link">
-                <img src="img/header/aergibide_blanco.png" alt="Aergibide SL">
-            </a>
+        <a href="index.php?controller=AergibideController&accion=inicio" class="logo link">
+            <img src="img/header/aergibide_blanco.png" alt="Aergibide SL">
+        </a>
         </div>
 
         <div class="logoCentro">

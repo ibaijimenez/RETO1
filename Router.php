@@ -1,30 +1,22 @@
 <?php
 
 class Router {
-    
-    // Como el router no tiene estados, los métodos pueden ser estáticos.
+
     public static function dispatch() {
-        // Determinar controlador (por defecto AergibideController)
-        $controllerName = $_GET['controller'] ?? 'AergibideController';
-        
-        // Determinar acción (por defecto index)
+        // Por defecto: loginController (muestra el login)
+        $controllerName = $_GET['controller'] ?? 'loginController';
+
+        // Por defecto: método index
         $action = $_GET['accion'] ?? 'index';
-        
-        // Cargar y ejecutar controlador
+
         self::loadController($controllerName, $action);
     }
-    
+
     private static function loadController($controllerName, $action) {
-        // Construir ruta del archivo del controlador
         $controllerFile = __DIR__ . "/controllers/{$controllerName}.php";
         require_once $controllerFile;
-        
-        // Instanciar controlador
-        $controller = new $controllerName();
 
-        // Ejecutar método
+        $controller = new $controllerName();
         $controller->$action();
     }
-    
-
 }

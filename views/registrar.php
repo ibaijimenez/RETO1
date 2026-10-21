@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <base href="/RETO1/">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Aergibide SL - Registrarse</title>
     <link rel="stylesheet" href="styles/styles.css">
@@ -29,7 +30,7 @@
                     plataforma.
                 </p>
 
-                <form action="#" method="POST">
+                <form action="index.php?controller=registrarController&action=registrar" method="POST">
 
                     <label for="nombre">Nombre</label>
                     <div class="campoLogin">
@@ -86,7 +87,7 @@
                         </span>
                     </label>
 
-                    <button type="submit">CREAR CUENTA</button>
+                    <button type="submit" id="btnCrearCuenta">CREAR CUENTA</button>
 
                 </form>
 
@@ -95,7 +96,7 @@
 
                 <p class="registroLogin">
                     ¿Ya tienes cuenta?
-                    <a href="index.php?pagina=login" class="registrar">Inicia sesión</a>
+                    <a href="index.php?pagina=login" class="regigit branchstrar">Inicia sesión</a>
                 </p>
 
             </div>
