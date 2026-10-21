@@ -24,7 +24,7 @@ class AergibideModel {
             ':nombre'       => $datos['nombre'],
             ':apellidos'    => $datos['apellidos'],
             ':correo'       => $datos['correo'],
-            ':contrasena'   => password_hash($datos['contrasena'], PASSWORD_DEFAULT), 
+            ':contrasena'   => ':passwd' => $datos['contrasena'],, 
             ':departamento' => $datos['departamento']
         ]);
 
