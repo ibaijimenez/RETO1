@@ -33,4 +33,6 @@ class AergibideController extends BaseController {
         $preguntasMasLikes = Pregunta::getPreguntasMasLikes();
         require_once 'views/main.php'; 
     }
+
+    
 }
