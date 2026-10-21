@@ -1,41 +1,31 @@
 <?php
+// Requerimos el modelo para poder hacer la consulta directa desde la vista
+require_once __DIR__ . '/../models/AergibideModel.php';
 
 $pagina_activa  = 'inicio';
-$nombre_usuario = '';
+$usuarioId      = (int)($_SESSION['usuario_id'] ?? 0);
+$nombre_usuario = $_SESSION['nombre_usuario'] ?? '';
 
-// Datos de ejemplo. Más adelante vendrán de la base de datos.
-$preguntas = [
-    [
-        'titulo'  => '¿Cómo mejorar la precisión de los sensores de temperatura en ensayos de laboratorio?',
-        'etiquetas' => ['Instrumentación', 'Sensores', 'Ensayos'],
-        'autor'   => 'Elena Ruiz',
-        'likes'   => 30,
-        'fecha'   => '22/11/2026',
-        'me_gusta' => true,
-        'guardada' => true,
-    ],
-    [
-        'titulo'  => '¿Cómo podemos reducir el peso de una estructura aeronáutica?',
-        'etiquetas' => ['Materiales', 'Diseño estructural', 'Aeronáutica'],
-        'autor'   => 'Ana Torres',
-        'likes'   => 23,
-        'fecha'   => '13/10/2026',
-        'me_gusta' => false,
-        'guardada' => false,
-    ],
-    [
-        'titulo'  => '¿Alguien ha trabajado con el material Ti6Al4V en procesos de mecanizado?',
-        'etiquetas' => ['Materiales', 'Mecanizado', 'Ti6Al4V'],
-        'autor'   => 'Pablo López',
-        'likes'   => 18,
-        'fecha'   => '02/08/2026',
-        'me_gusta' => false,
-        'guardada' => false,
-    ],
-];
+// 1. Consultamos las preguntas reales a la BD usando la función existente en AergibideModel
+$preguntasBD = AergibideModel::getPreguntas($usuarioId, 'todas', '', 'likes');
+
+// 2. Mapeamos los campos para que encajen exactamente con las variables de tu HTML
+$preguntas = array_map(function($p) {
+    return [
+        'id'        => $p['id'],
+        'titulo'    => $p['titulo'],
+        'etiquetas' => !empty($p['temas']) ? explode('||', $p['temas']) : [],
+        'autor'     => $p['autor'],
+        'likes'     => (int)$p['likes'],
+        'fecha'     => date('d/m/Y', strtotime($p['fecha_creacion'])),
+        'me_gusta'  => (bool)$p['me_gusta'],
+        'guardada'  => (bool)$p['guardada'],
+    ];
+}, $preguntasBD);
 
 $usuarios = ['Ana Torres', 'Pablo López', 'Elena Ruiz'];
 $img = 'img/main/'; 
+
 require __DIR__ . '/layout/head.php';
 require __DIR__ . '/layout/sidebar.php';
 ?>
@@ -48,7 +38,8 @@ require __DIR__ . '/layout/sidebar.php';
     <!-- Banner de bienvenida -->
     <section class="bannerHola">
         <div class="bannerHolaTexto">
-            <h2><span class="manoSaludo">👋</span> ¡Hola<?= $nombre_usuario !== '' ? ', ' . htmlspecialchars($nombre_usuario) : ''; ?>!</h2>            <p class="holaPrimera">Bienvenido a tu panel de AERGIBIDE SL</p>
+            <h2><span class="manoSaludo">👋</span> ¡Hola<?= $nombre_usuario !== '' ? ', ' . htmlspecialchars($nombre_usuario) : ''; ?>!</h2>
+            <p class="holaPrimera">Bienvenido a tu panel de AERGIBIDE SL</p>
             <p>
                 Aquí puedes consultar todas las opciones y
                 mantenerte al día con tus preguntas, documentos
@@ -58,17 +49,18 @@ require __DIR__ . '/layout/sidebar.php';
     </section>
 
     <!-- Banner de visión -->
-<img class="bannerVision" src="img/main/vision.png" alt="Nuestra visión de ingeniería: construyendo el futuro aeroespacial con precisión, colaboración y un enfoque en la calidad">
+    <img class="bannerVision" src="img/main/vision.png" alt="Nuestra visión de ingeniería: construyendo el futuro aeroespacial con precisión, colaboración y un enfoque en la calidad">
+
     <!-- Preguntas y usuarios -->
     <div class="inicioColumnas">
 
-                <section class="columnaPreguntas">
+        <section class="columnaPreguntas">
             <h2 class="tituloSeccion">PREGUNTAS DESTACADAS</h2>
 
             <?php foreach ($preguntas as $p): ?>
                 <span class="etiquetaTipo">PREGUNTA</span>
 
-                <article class="tarjetaPregunta">
+                <article class="tarjetaPregunta" data-id="<?= $p['id']; ?>">
 
                     <div class="tarjetaCabecera">
                         <h3><?= htmlspecialchars($p['titulo']); ?></h3>

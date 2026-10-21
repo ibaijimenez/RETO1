@@ -43,4 +43,10 @@ class AergibideController extends BaseController {
     public function inicio() {
         require __DIR__ . '/../views/main.php';
     }
+
+    public function listarMasGustadas()
+    {
+        $preguntasMasLikes = Pregunta::getPreguntasMasLikes();
+        require_once 'views/main.php'; 
+    }
 }
