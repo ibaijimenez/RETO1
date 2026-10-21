@@ -2,10 +2,11 @@
 $pagina_activa = 'preguntas';
 
 // Valores por si el formulario vuelve con errores (así no se pierde lo escrito)
-$errores     = $errores     ?? [];
-$titulo      = $titulo      ?? '';
-$descripcion = $descripcion ?? '';
-$etiquetas   = $etiquetas   ?? '';
+$errores          = $errores          ?? [];
+$titulo           = $titulo           ?? '';
+$descripcion      = $descripcion      ?? '';
+$seleccionados    = $seleccionados    ?? [];
+$temasDisponibles = $temasDisponibles ?? [];
 
 $rutaPreguntas = 'index.php?controller=PreguntasController&accion=preguntas';
 
@@ -28,9 +29,9 @@ require __DIR__ . '/layout/sidebar.php';
     </p>
 
     <form class="formPregunta" method="POST"
-        action="index.php?controller=PreguntasController&accion=publicarPregunta">
+          action="index.php?controller=PreguntasController&accion=publicarPregunta">
 
-    <?php if (!empty($errores)): ?>
+        <?php if (!empty($errores)): ?>
             <div class="erroresForm">
                 <?php foreach ($errores as $error): ?>
                     <p><?= htmlspecialchars($error); ?></p>
@@ -47,18 +48,21 @@ require __DIR__ . '/layout/sidebar.php';
         <textarea id="descripcion" name="descripcion" required
                   placeholder="Explica tu duda, las pruebas realizadas y los resultados obtenidos...."><?= htmlspecialchars($descripcion); ?></textarea>
 
-        <label for="etiquetas">Etiquetas</label>
-        <div class="campoEtiquetas">
-            <svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true">
-                <path d="M3 12V4a1 1 0 0 1 1-1h8l9 9-9 9-9-9z" fill="none" stroke="#777E86"
-                      stroke-width="1.5" stroke-linejoin="round"/>
-                <circle cx="8" cy="8" r="1.5" fill="none" stroke="#777E86" stroke-width="1.5"/>
-            </svg>
-            <input type="text" id="etiquetas" name="etiquetas"
-                   placeholder="Añade etiquetas (ej: turbinas, materiales...)"
-                   value="<?= htmlspecialchars($etiquetas); ?>">
+        <label>Etiquetas</label>
+        <div class="filaTemas">
+            <?php for ($i = 0; $i < 3; $i++): ?>
+                <select name="temas[]" class="selectTema">
+                    <option value="">Elige una etiqueta</option>
+                    <?php foreach ($temasDisponibles as $t): ?>
+                        <option value="<?= (int) $t['id']; ?>"
+                            <?= (isset($seleccionados[$i]) && (int) $seleccionados[$i] === (int) $t['id']) ? 'selected' : ''; ?>>
+                            <?= htmlspecialchars($t['nombre']); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            <?php endfor; ?>
         </div>
-        <p class="ayudaForm">Sepáralas con comas. Máximo 5 etiquetas.</p>
+        <p class="ayudaForm">Puedes elegir hasta 3 etiquetas.</p>
 
         <div class="pieForm">
             <p class="avisoForm">Los campos marcados con <span class="obligatorio">*</span> son obligatorios.</p>
