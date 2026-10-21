@@ -1,8 +1,5 @@
 <?php
-$pagina = $_GET['pagina'] ?? 'login';
+session_start();
+require_once 'Router.php';
 
-if ($pagina === 'registrar') {
-    require 'views/registrar.php';
-} else {
-    require 'views/login.php';
-}
+Router::dispatch();
