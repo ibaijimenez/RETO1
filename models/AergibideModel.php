@@ -24,7 +24,7 @@ class AergibideModel {
             ':nombre'       => $datos['nombre'],
             ':apellidos'    => $datos['apellidos'],
             ':correo'       => $datos['correo'],
-            ':contrasena'   => $datos['contrasena'],, 
+            ':contrasena'   => $datos['contrasena'],
             ':departamento' => $datos['departamento']
         ]);
 
