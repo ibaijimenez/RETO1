@@ -23,7 +23,13 @@ class AergibideController extends BaseController {
     public function destroyAll() {
         
     }
-    
+    public function favoritos(){
+            if (!isset($_SESSION['usuario_id'])) {
+            header('Location: index.php');
+            exit;
+        }
+        require __DIR__ . '/../views/favoritos.php';
+    }
     public function preguntas() {
         // Sin sesión, al login
         if (!isset($_SESSION['usuario_id'])) {

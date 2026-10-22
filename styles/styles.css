@@ -869,3 +869,72 @@ h3,
     .cajaRespuestas { height: auto; flex-direction: row; padding: 12px; }
     .cabeceraPreguntas { flex-direction: column; }
 }
+/* ==========================================================================
+   ESTILOS DE FAVORITOS
+   ========================================================================== */
+.cabeceraFavoritos {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    margin-bottom: 22px;
+}
+
+.cabeceraFavoritos h1 {
+    font-size: 48px;
+    color: #000;
+    margin-bottom: 6px;
+}
+
+.iconoFavoritos {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background-color: #E3F4F0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.iconoFavoritos img {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+}
+
+.tarjetaFavorito {
+    margin-bottom: 28px;
+}
+
+/* Tarjeta de respuesta */
+.tarjetaRespuesta {
+    border: 1px solid #BFC3C7;
+    border-radius: 12px;
+    padding: 18px 22px;
+    margin-bottom: 14px;
+    background-color: white;
+}
+
+.respuestaCabecera {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 10px;
+}
+
+.respuestaCabecera h4 {
+    font-size: 20px;
+    color: #111820;
+}
+
+.tiempoRespuesta {
+    font-size: 14px;
+    color: #9CA3AF;
+}
+
+.textoRespuesta {
+    font-size: 16px;
+    color: #777E86;
+    line-height: 1.4;
+    margin-bottom: 12px;
+}

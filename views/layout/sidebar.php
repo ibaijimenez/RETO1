@@ -9,7 +9,7 @@ $menu_items = [
     ['id' => 'inicio',         'texto' => 'Inicio',         'url' => $ruta.'inicio',    'icono_verde'=>'img/aside/avion_verde.png',      'icono_blanco'=>'img/aside/avion_blanco.png'],
     ['id' => 'preguntas',      'texto' => 'Preguntas',      'url' => $ruta.'preguntas', 'icono_verde'=>'img/aside/preguntas_verde.png',  'icono_blanco'=>'img/aside/preguntas_blanco.png'],
     ['id' => 'documentos',     'texto' => 'Documentos',     'url' => '#',               'icono_verde'=>'img/aside/documentos_verde.png', 'icono_blanco'=>'img/aside/documentos_blanco.png'],
-    ['id' => 'favoritos',      'texto' => 'Favoritos',      'url' => '#',               'icono_verde'=>'',                               'icono_blanco'=>'img/aside/favoritos_blanco.png'],
+    ['id' => 'favoritos',      'texto' => 'Favoritos',      'url' => 'index.php?controller=FavoritosController&accion=favoritos', 'icono_verde'=>'img/aside/favoritos_verde.png','icono_blanco'=>'img/aside/favoritos_blanco.png'],
     ['id' => 'notificaciones', 'texto' => 'Notificaciones', 'url' => '#',               'icono_verde'=>'',                               'icono_blanco'=>'img/aside/notificaciones_blanco.png'],
 ];
 ?>

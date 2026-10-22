@@ -114,16 +114,14 @@ class AergibideModel {
 
     public static function toggleLike($usuarioId, $preguntaId) {
     $db = Database::getConnection();
-
-    // Miramos si ya le había dado like
     $stmt = $db->prepare("SELECT * FROM pregunta_likes WHERE pregunta_id = :p AND usuario_id = :u");
     $stmt->execute([':p' => $preguntaId, ':u' => $usuarioId]);
 
     if ($stmt->fetch()) {
-        // Ya tenía like: lo quitamos
+        // ya tenia like
         $stmt = $db->prepare("DELETE FROM pregunta_likes WHERE pregunta_id = :p AND usuario_id = :u");
     } else {
-        // No tenía like: lo añadimos
+        // no tenia like
         $stmt = $db->prepare("INSERT INTO pregunta_likes (pregunta_id, usuario_id) VALUES (:p, :u)");
     }
     $stmt->execute([':p' => $preguntaId, ':u' => $usuarioId]);
