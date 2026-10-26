@@ -161,6 +161,15 @@ aside {
     border-radius: 50%;
     object-fit: cover;
 }
+
+.usuario-aside a {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    color: #FFFFFF;
+    text-decoration: none;
+}
+
 /* ==========================================================================
    ESTILOS DEL LOG IN
    ========================================================================== */
