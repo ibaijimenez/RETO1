@@ -29,7 +29,7 @@ class AergibideModel {
             "contrasena" => $contrasena
         ];
         $db = Database::getConnection();
-        $stmt = $db->prepare("SELECT * FROM usuarios where nombre=:usuario AND passwd=:contrasena ");
+        $stmt = $db->prepare("SELECT * FROM usuarios WHERE nombre = :usuario AND passwd = :contrasena");
         $stmt->execute($datos);
         return $stmt->fetch();
     }
@@ -88,17 +88,18 @@ class AergibideModel {
 
     public static function getPreguntasMasLikes(?int $limite = null): array
     {
+        // pregunta_likes no tiene columna "id": se cuenta por usuario_id
         $sql = "
             SELECT
                 p.id,
                 p.titulo,
                 p.fecha_creacion,
                 u.nombre AS autor,
-                COUNT(l.id) AS likes
+                COUNT(l.usuario_id) AS likes
             FROM preguntas p
             JOIN usuarios u ON u.id = p.usuario_id
             LEFT JOIN pregunta_likes l ON l.pregunta_id = p.id
-            GROUP BY p.id
+            GROUP BY p.id, p.titulo, p.fecha_creacion, u.nombre
             ORDER BY likes DESC
         ";
 
@@ -184,7 +185,7 @@ class AergibideModel {
         return $fila ?: null;
     }
 
-    // Respuestas de una pregunta (las más antiguas primero), con likes y favorita del usuario
+    // Respuestas de una pregunta (las más antiguas primero), con likes y si el usuario dio like
     public static function getRespuestas(int $preguntaId, int $usuarioId): array
     {
         $db   = Database::getConnection();
@@ -199,6 +200,26 @@ class AergibideModel {
             ORDER BY r.fecha_creacion ASC
         ");
         $stmt->execute([':uid_like' => $usuarioId, ':pid' => $preguntaId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    // Respuestas a las que el usuario ha dado like (para Favoritos)
+    public static function getRespuestasFavoritas(int $usuarioId): array
+    {
+        $db   = Database::getConnection();
+        $stmt = $db->prepare("
+            SELECT r.id, r.pregunta_id, r.contenido, r.fecha_creacion,
+                   u.nombre AS autor,
+                   p.titulo AS pregunta_titulo,
+                   (SELECT COUNT(*) FROM respuesta_likes x WHERE x.respuesta_id = r.id) AS likes
+            FROM respuesta_likes rl
+            JOIN respuestas r ON r.id = rl.respuesta_id
+            JOIN usuarios u   ON u.id = r.usuario_id
+            JOIN preguntas p  ON p.id = r.pregunta_id
+            WHERE rl.usuario_id = :uid
+            ORDER BY rl.id DESC
+        ");
+        $stmt->execute([':uid' => $usuarioId]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
@@ -219,9 +240,9 @@ class AergibideModel {
     public static function alternar(string $tipo, int $id, int $usuarioId): array
     {
         $config = [
-            'pregunta_like'      => ['tabla' => 'pregunta_likes',      'col' => 'pregunta_id'],
-            'pregunta_guardar'   => ['tabla' => 'preguntas_guardadas', 'col' => 'pregunta_id'],
-            'respuesta_like'     => ['tabla' => 'respuesta_likes',     'col' => 'respuesta_id'],
+            'pregunta_like'    => ['tabla' => 'pregunta_likes',      'col' => 'pregunta_id'],
+            'pregunta_guardar' => ['tabla' => 'preguntas_guardadas', 'col' => 'pregunta_id'],
+            'respuesta_like'   => ['tabla' => 'respuesta_likes',     'col' => 'respuesta_id'],
         ];
         if (!isset($config[$tipo])) {
             throw new InvalidArgumentException('Tipo no válido');
@@ -247,5 +268,4 @@ class AergibideModel {
 
         return ['activo' => !$existe, 'total' => (int) $stmt->fetchColumn()];
     }
-
 }

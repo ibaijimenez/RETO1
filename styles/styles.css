@@ -1249,3 +1249,67 @@ main.detallePregunta h1 {
     .formRespuesta .btnPublicar { width: 100%; justify-content: center; }
     .btnFavorita { font-size: 15px; padding: 7px 16px 7px 12px; }
 }
+
+/* ==========================================================================
+   ESTILOS DE FAVORITOS
+   ========================================================================== */
+.cabeceraFavoritos {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    margin-bottom: 22px;
+}
+
+.cabeceraFavoritos h1 {
+    font-size: 48px;
+    color: #000;
+    margin-bottom: 6px;
+}
+
+.iconoFavoritos {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.iconoFavoritos img {
+    width: 64px;
+    height: auto;
+    display: block;
+}
+
+@media (max-width: 900px) {
+    .cabeceraFavoritos { gap: 16px; }
+    .cabeceraFavoritos h1 { font-size: 34px; }
+    .iconoFavoritos img { width: 48px; }
+}
+
+/* ==========================================================================
+   FAVORITOS: tarjetas de pregunta y respuesta
+   ========================================================================== */
+.tarjetaFavorito { margin-bottom: 28px; }
+
+.respuestaEn {
+    font-size: 16px;
+    color: #777E86;
+    margin-bottom: 10px;
+}
+.respuestaEn a {
+    color: #00A67E;
+    text-decoration: none;
+    font-weight: 600;
+}
+.respuestaEn a:hover { text-decoration: underline; }
+
+.respuestaFavTexto {
+    font-size: 19px;
+    line-height: 1.5;
+    color: #111820;
+    margin-bottom: 20px;
+}
+
+.tarjetaFavorito .tarjetaCabecera h3 a {
+    color: inherit;
+    text-decoration: none;
+}
