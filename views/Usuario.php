@@ -84,15 +84,15 @@
 
 
 <main class="perfil">
-
-    <!-- cabecera de la pagina  (foto perfil, nombre, contador de guardados y preguntas) -->
-    <section class="cabecera-perfil">
+<!-- PARTE SUPERIOR -->
+    <!-- cabecera de la pagina: foto perfil, nombre, contador de guardados y preguntas -->
+    <section class="cabeceraPerfil">
         <div class="foto">
-            <img src="img/aside/logo_usuarios.png" alt="Avatar de <?= ($usuario['nombre']); ?>">
+            <img src="img/aside/logo_usuarios.png" alt="Avatar de <?= ($usuario['nombre']); ?>"><!-- la imagen -->
         </div>
-        <h1 class="nombreUser"><?= $usuario['nombre']; ?></h1>
+        <h1 class="nombreUser"><?= $usuario['nombre']; ?></h1><!-- nombre del usuario -->
 
-
+        <!-- para los contadores de pruntas del usuario y gpreguntas guardadas -->
         <div class="datosContador">
             <div class="dato">
                 <span class="numero"><?= count($mis_preguntas); ?></span>
@@ -104,7 +104,7 @@
             </div>
         </div>
 
-        <!-- los tres apartados -->
+        <!-- los tres apartados: preguntas, favoritos, informacion -->
         <div class="apartados">
             <button type="button" class="pestana-btn activa" onclick="cambiarPestana('preguntas', this)">Preguntas</button>
             <button type="button" class="pestana-btn" onclick="cambiarPestana('guardados', this)">Guardados</button>
@@ -112,6 +112,7 @@
         </div>
     </section>
 
+<!-- PARTE DE ABAJO -->
     <div class="listaPreguntas">
         <!-- pestaña preguntas usuario activa -->
         <div id="preguntas" class="seccionPestana">
@@ -152,14 +153,14 @@
                     </div>
                 </article>
             
-
+        <!-- cpestaña de guardados -->
         <div id="guardados" class="seccionPestana" style="display: none;">
             <?php foreach ($preguntas_guardadas as $p): ?>
                 <article class="tarjetaPregunta">
                     <div class="tarjetaCabecera">
                         <h3><?= $p['titulo']; ?></h3>
                         <button type="button" class="btnGuardar">
-                            <img src="<?= $img; ?>guardadoVerde.png" alt="Guardada">
+                            <img src="<?= $img; ?>guardadoConRelleno.png" alt="Guardada">
                         </button>
                     </div>
 
@@ -187,7 +188,7 @@
                     </div>
                 </article>
             
-
+        <!-- pestaña de informacion  -->
         <div id="informacion" class="seccionPestana" style="display: none;">
             <div class="formInformacion">
                 <div class="campoInfo">
