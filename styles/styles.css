@@ -958,27 +958,6 @@ main.nuevaPregunta h1 {
     color: #777E86;
 }
 
-/* Etiquetas con icono dentro del campo */
-.campoEtiquetas {
-    position: relative;
-}
-
-.campoEtiquetas svg {
-    position: absolute;
-    left: 16px;
-    top: 14px;
-}
-
-.campoEtiquetas input[type="text"] {
-    padding-left: 58px;
-    margin-bottom: 8px;
-}
-
-.ayudaForm {
-    color: #777E86;
-    font-size: 17px;
-    margin-bottom: 30px;
-}
 
 /* Errores de validación */
 .erroresForm {
@@ -1042,3 +1021,240 @@ main.nuevaPregunta h1 {
     background-color: #009D76;
 }
 
+/* ==========================================================================
+   DESPLEGABLES DE ETIQUETAS
+   ========================================================================== */
+.filaTemas {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 8px;
+}
+
+.selectTema {
+    flex: 1;
+    min-width: 0;
+    box-sizing: border-box;
+    border: 1px solid #BFC3C7;
+    border-radius: 12px;
+    padding: 13px 18px;
+    font-family: var(--fuente-texto);
+    font-size: 20px;
+    color: #30363D;
+    background-color: white;
+    outline: none;
+    cursor: pointer;
+}
+
+.selectTema:focus {
+    border-color: #00B386;
+}
+
+@media (max-width: 900px) {
+    .filaTemas { flex-direction: column; }
+}
+
+
+/* ==========================================================================
+   ESTILOS DE DETALLE PREGUNTA
+   (si ya pegaste el bloque anterior en style.css, BÓRRALO y pega este entero)
+   ========================================================================== */
+
+/* Título y caja de respuestas de la lista, ahora son enlaces */
+.tarjetaCabecera h3 a {
+    color: inherit;
+    text-decoration: none;
+}
+.tarjetaCabecera h3 a:hover {
+    color: #00A67E;
+}
+
+a.cajaRespuestas {
+    text-decoration: none;
+    color: #111820;
+    transition: transform 0.15s, box-shadow 0.15s;
+}
+a.cajaRespuestas:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.22);
+}
+
+/* Cabecera del detalle */
+main.detallePregunta h1 {
+    font-size: 34px;
+    color: #000;
+    margin-bottom: 14px;
+}
+
+.metaDetalle {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 14px 44px;
+    font-size: 17px;
+    color: #111820;
+    margin-bottom: 30px;
+}
+
+.metaItem {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.avatarDetalle {
+    display: inline-flex;
+    width: 42px;
+    height: 42px;
+}
+.avatarDetalle img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+.avatarGrande { width: 48px; height: 48px; }
+
+/* --------------------------------------------------------------------------
+   Botones pulsables (like, guardar, respuesta favorita)
+   El estado activo lo marca aria-pressed="true" (lo cambia detalle.js)
+   -------------------------------------------------------------------------- */
+.btnAccion {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: inherit;
+    color: inherit;
+}
+.btnAccion:disabled { opacity: 0.6; cursor: wait; }
+
+.btnAccion:focus-visible {
+    outline: 2px solid #00A67E;
+    outline-offset: 3px;
+    border-radius: 8px;
+}
+
+/* Dos imágenes por botón: se enseña una u otra según aria-pressed */
+.btnAccion img { display: block; }
+.btnAccion .iconoOn { display: none; }
+.btnAccion[aria-pressed="true"] .iconoOn { display: block; }
+.btnAccion[aria-pressed="true"] .iconoOff { display: none; }
+
+.btnCorazon img { width: 34px; height: auto; }
+.btnGuardarTexto img { width: 28px; height: 34px; object-fit: contain; }
+.btnGuardarTexto[aria-pressed="true"] { color: #00A67E; }
+
+.metaItem .iconoCalendario { width: 30px; height: auto; }
+
+/* Caja de descripción */
+.cajaDescripcion {
+    border: 1px solid #BFC3C7;
+    border-radius: 14px;
+    padding: 18px 22px;
+    margin-bottom: 36px;
+}
+.cajaDescripcion h2 {
+    font-size: 22px;
+    color: #111820;
+    margin-bottom: 8px;
+}
+.cajaDescripcion p {
+    font-size: 19px;
+    line-height: 1.5;
+    color: #4B5563;
+}
+
+.tituloDetalle {
+    font-size: 24px;
+    color: #111820;
+    margin: 34px 0 14px;
+}
+
+/* Respuestas */
+.tarjetaRespuesta {
+    border: 1px solid #BFC3C7;
+    border-radius: 14px;
+    padding: 18px 22px;
+    margin-bottom: 14px;
+}
+
+.respuestaCabecera {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 24px;
+    color: #111820;
+}
+.respuestaCabecera strong { font-weight: 400; }
+
+.respuestaFecha {
+    font-size: 15px;
+    color: #9CA3AF;
+}
+
+.respuestaTexto {
+    margin: 10px 0 0 64px;
+    font-size: 19px;
+    line-height: 1.5;
+    color: #4B5563;
+}
+
+.respuestaPie {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 24px;
+    margin: 14px 0 0 64px;
+    font-size: 16px;
+    color: #111820;
+}
+
+/* Formulario de respuesta */
+.formRespuesta {
+    border: 1px solid #BFC3C7;
+    border-radius: 14px;
+    padding: 18px 22px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 16px;
+}
+
+.formRespuesta .erroresForm {
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 0;
+}
+
+.formRespuesta textarea {
+    width: 100%;
+    box-sizing: border-box;
+    min-height: 170px;
+    border: none;
+    outline: none;
+    resize: vertical;
+    font-family: var(--fuente-texto);
+    font-size: 20px;
+    color: #30363D;
+}
+.formRespuesta textarea::placeholder { color: #777E86; }
+
+/* --------------------------------------------------------------------------
+   Responsive
+   -------------------------------------------------------------------------- */
+@media (max-width: 1100px) {
+    .metaDetalle { gap: 14px 28px; }
+}
+
+@media (max-width: 900px) {
+    main.detallePregunta h1 { font-size: 26px; }
+    .respuestaTexto,
+    .respuestaPie { margin-left: 0; }
+    .respuestaCabecera { font-size: 20px; gap: 12px; }
+    .avatarGrande { width: 40px; height: 40px; }
+}
+
+@media (max-width: 600px) {
+    .metaDetalle { flex-direction: column; align-items: flex-start; }
+    .formRespuesta .btnPublicar { width: 100%; justify-content: center; }
+    .btnFavorita { font-size: 15px; padding: 7px 16px 7px 12px; }
+}

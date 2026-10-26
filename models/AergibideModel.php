@@ -2,50 +2,25 @@
 require_once __DIR__ . '/Database.php';
 
 class AergibideModel {
-    
+
     public static function getAll() {
-        
+
     }
-    
+
     public static function getById($id) {
-        
+
     }
-    
-    // registrar usuario nuevo
+
     public static function create($datos) {
-        $db = Database::getConnection();
-
-        $stmt = $db->prepare(
-            "INSERT INTO usuarios (nombre, apellidos, correo, passwd, departamento)
-             VALUES (:nombre, :apellidos, :correo, :passwd, :departamento)"
-        );
-
-        return $stmt->execute([
-            ':nombre'       => $datos['nombre'],
-            ':apellidos'    => $datos['apellidos'],
-            ':correo'       => $datos['correo'],
-            ':contrasena'   => $datos['contrasena'],
-            ':departamento' => $datos['departamento']
-        ]);
 
     }
 
-    // comprobar si existe correo ya registrado
-    public static function existeCorreo($correo) {
-        $db = Database::getConnection();
-        $stmt = $db->prepare("SELECT 1 FROM usuarios WHERE correo = :c");
-        $stmt->execute([':c' => $correo]);
-        return (bool) $stmt->fetch();
-    }
-
-    
-    
     public static function deleteById($id) {
-        
+
     }
-    
+
     public static function deleteAll() {
-        
+
     }
 
     public static function comprobarCredenciales($usuario, $contrasena) {
@@ -54,9 +29,9 @@ class AergibideModel {
             "contrasena" => $contrasena
         ];
         $db = Database::getConnection();
-        $stmt=$db -> prepare("SELECT * FROM usuarios where  nombre=:usuario AND passwd=:contrasena ");
-        $stmt->execute($datos); 
-        return $stmt->fetch(); 
+        $stmt = $db->prepare("SELECT * FROM usuarios where nombre=:usuario AND passwd=:contrasena ");
+        $stmt->execute($datos);
+        return $stmt->fetch();
     }
 
     public static function getPreguntas(int $usuarioId, string $filtro = 'todas', string $busqueda = '', string $orden = 'recientes'): array
@@ -110,12 +85,13 @@ class AergibideModel {
         $stmt->execute($params);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);   // array asociativo, como usa la vista
     }
+
     public static function getPreguntasMasLikes(?int $limite = null): array
     {
         $sql = "
-            SELECT 
-                p.id, 
-                p.titulo, 
+            SELECT
+                p.id,
+                p.titulo,
                 p.fecha_creacion,
                 u.nombre AS autor,
                 COUNT(l.id) AS likes
@@ -133,24 +109,143 @@ class AergibideModel {
         $db   = Database::getConnection();
         $stmt = $db->prepare($sql);
         $stmt->execute();
-        
+
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public static function toggleLike($usuarioId, $preguntaId) {
-    $db = Database::getConnection();
-
-    // Miramos si ya le había dado like
-    $stmt = $db->prepare("SELECT * FROM pregunta_likes WHERE pregunta_id = :p AND usuario_id = :u");
-    $stmt->execute([':p' => $preguntaId, ':u' => $usuarioId]);
-
-    if ($stmt->fetch()) {
-        // Ya tenía like: lo quitamos
-        $stmt = $db->prepare("DELETE FROM pregunta_likes WHERE pregunta_id = :p AND usuario_id = :u");
-    } else {
-        // No tenía like: lo añadimos
-        $stmt = $db->prepare("INSERT INTO pregunta_likes (pregunta_id, usuario_id) VALUES (:p, :u)");
+    // Devuelve todos los temas (para rellenar los desplegables)
+    public static function getTemas(): array
+    {
+        $db   = Database::getConnection();
+        $stmt = $db->query("SELECT id, nombre FROM temas ORDER BY nombre");
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-    $stmt->execute([':p' => $preguntaId, ':u' => $usuarioId]);
-}
+
+    // Guarda una pregunta nueva y sus temas. Devuelve el id de la pregunta.
+    public static function crearPregunta(int $usuarioId, string $titulo, string $descripcion, array $temasIds): int
+    {
+        $db = Database::getConnection();
+
+        try {
+            // Transacción: o se guarda todo, o no se guarda nada
+            $db->beginTransaction();
+
+            // 1. La pregunta
+            $stmt = $db->prepare(
+                "INSERT INTO preguntas (usuario_id, titulo, descripcion)
+                 VALUES (:uid, :titulo, :descripcion)"
+            );
+            $stmt->execute([
+                ':uid'         => $usuarioId,
+                ':titulo'      => $titulo,
+                ':descripcion' => $descripcion,
+            ]);
+            $preguntaId = (int) $db->lastInsertId();
+
+            // 2. Sus temas (tabla intermedia)
+            $stmtTema = $db->prepare(
+                "INSERT INTO pregunta_temas (pregunta_id, tema_id) VALUES (:pregunta, :tema)"
+            );
+            foreach ($temasIds as $temaId) {
+                $stmtTema->execute([':pregunta' => $preguntaId, ':tema' => $temaId]);
+            }
+
+            $db->commit();
+            return $preguntaId;
+
+        } catch (Throwable $e) {
+            if ($db->inTransaction()) {
+                $db->rollBack();
+            }
+            throw $e;
+        }
+    }
+
+    // Devuelve una pregunta con autor, likes y si el usuario la ha likeado/guardado. null si no existe.
+    public static function getPregunta(int $id, int $usuarioId): ?array
+    {
+        $sql = "
+            SELECT p.id, p.titulo, p.descripcion, p.fecha_creacion,
+                u.nombre AS autor,
+                (SELECT COUNT(*) FROM respuestas r WHERE r.pregunta_id = p.id) AS respuestas,
+                (SELECT COUNT(*) FROM pregunta_likes l WHERE l.pregunta_id = p.id) AS likes,
+                EXISTS(SELECT 1 FROM pregunta_likes l2
+                        WHERE l2.pregunta_id = p.id AND l2.usuario_id = :uid_like) AS me_gusta,
+                EXISTS(SELECT 1 FROM preguntas_guardadas g
+                        WHERE g.pregunta_id = p.id AND g.usuario_id = :uid_guard) AS guardada
+            FROM preguntas p
+            JOIN usuarios u ON u.id = p.usuario_id
+            WHERE p.id = :id
+        ";
+        $db   = Database::getConnection();
+        $stmt = $db->prepare($sql);
+        $stmt->execute([':uid_like' => $usuarioId, ':uid_guard' => $usuarioId, ':id' => $id]);
+        $fila = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $fila ?: null;
+    }
+
+    // Respuestas de una pregunta (las más antiguas primero), con likes y favorita del usuario
+    public static function getRespuestas(int $preguntaId, int $usuarioId): array
+    {
+        $db   = Database::getConnection();
+        $stmt = $db->prepare("
+            SELECT r.id, r.contenido, r.fecha_creacion, u.nombre AS autor,
+                (SELECT COUNT(*) FROM respuesta_likes rl WHERE rl.respuesta_id = r.id) AS likes,
+                EXISTS(SELECT 1 FROM respuesta_likes rl2
+                        WHERE rl2.respuesta_id = r.id AND rl2.usuario_id = :uid_like) AS me_gusta
+            FROM respuestas r
+            JOIN usuarios u ON u.id = r.usuario_id
+            WHERE r.pregunta_id = :pid
+            ORDER BY r.fecha_creacion ASC
+        ");
+        $stmt->execute([':uid_like' => $usuarioId, ':pid' => $preguntaId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    // Guarda una respuesta nueva. Devuelve su id.
+    public static function crearRespuesta(int $preguntaId, int $usuarioId, string $contenido): int
+    {
+        $db   = Database::getConnection();
+        $stmt = $db->prepare("
+            INSERT INTO respuestas (pregunta_id, usuario_id, contenido)
+            VALUES (:pid, :uid, :contenido)
+        ");
+        $stmt->execute([':pid' => $preguntaId, ':uid' => $usuarioId, ':contenido' => $contenido]);
+        return (int) $db->lastInsertId();
+    }
+
+    // Activa o desactiva un like / guardado. Devuelve el nuevo estado y el total.
+    // $tipo sale de una lista blanca, así que las tablas nunca vienen del usuario.
+    public static function alternar(string $tipo, int $id, int $usuarioId): array
+    {
+        $config = [
+            'pregunta_like'      => ['tabla' => 'pregunta_likes',      'col' => 'pregunta_id'],
+            'pregunta_guardar'   => ['tabla' => 'preguntas_guardadas', 'col' => 'pregunta_id'],
+            'respuesta_like'     => ['tabla' => 'respuesta_likes',     'col' => 'respuesta_id'],
+        ];
+        if (!isset($config[$tipo])) {
+            throw new InvalidArgumentException('Tipo no válido');
+        }
+        $tabla = $config[$tipo]['tabla'];
+        $col   = $config[$tipo]['col'];
+
+        $db = Database::getConnection();
+
+        $stmt = $db->prepare("SELECT 1 FROM $tabla WHERE $col = :id AND usuario_id = :uid");
+        $stmt->execute([':id' => $id, ':uid' => $usuarioId]);
+        $existe = (bool) $stmt->fetchColumn();
+
+        if ($existe) {
+            $stmt = $db->prepare("DELETE FROM $tabla WHERE $col = :id AND usuario_id = :uid");
+        } else {
+            $stmt = $db->prepare("INSERT INTO $tabla ($col, usuario_id) VALUES (:id, :uid)");
+        }
+        $stmt->execute([':id' => $id, ':uid' => $usuarioId]);
+
+        $stmt = $db->prepare("SELECT COUNT(*) FROM $tabla WHERE $col = :id");
+        $stmt->execute([':id' => $id]);
+
+        return ['activo' => !$existe, 'total' => (int) $stmt->fetchColumn()];
+    }
+
 }
