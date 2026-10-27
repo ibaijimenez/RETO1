@@ -37,7 +37,7 @@
                     </p>
                 <?php endif; ?>
 
-                <form action="index.php?controller=registrarController&accion=registrar" method="POST">
+                <form action="index.php?controller=registroController&accion=registrar" method="POST">
 
                     <label for="nombre">Nombre</label>
                     <div class="campoLogin">
