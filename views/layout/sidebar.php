@@ -30,7 +30,7 @@ $menu_items = [
     </div>
 
     <div class="usuario-aside">
-        <a href="index.php?controller=UsuarioController&accion=perfil">
+        <a href="index.php?controller=usuarioController&accion=perfil">
             <img src="img/aside/logo_usuarios.png" alt="Usuario">
             <span>Carlos Martín</span>
         </a>
