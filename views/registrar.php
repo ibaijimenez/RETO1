@@ -5,6 +5,7 @@
     <base href="/RETO1/">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Aergibide SL - Registrarse</title>
+    <link rel="icon" type="image/png" href="img/header/favicon/favicon_registro.png">
     <link rel="stylesheet" href="styles/styles.css">
 </head>
 <body>
