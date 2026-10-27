@@ -38,7 +38,7 @@ class AergibideModel {
     {
         // Lista blanca de ordenaciones (evita inyección SQL)
         $ordenes = [
-            'recientes'  => 'p.fecha_creacion DESC',
+            'recientes'  => 'p.fecha_creacion DESC, p.id DESC',
             'likes'      => 'likes DESC',
             'respuestas' => 'respuestas DESC',
         ];
@@ -267,5 +267,83 @@ class AergibideModel {
         $stmt->execute([':id' => $id]);
 
         return ['activo' => !$existe, 'total' => (int) $stmt->fetchColumn()];
+    }
+
+    // ==================================================================
+    // DOCUMENTOS
+    // ==================================================================
+
+    // Lista de documentos. Se puede filtrar por categoría y limitar cuántos salen.
+    public static function getDocumentos(string $categoria = '', ?int $limite = null): array
+    {
+        $sql = "
+            SELECT d.id, d.categoria, d.titulo, d.descripcion,
+                   d.nombre_archivo, d.tipo_mime, d.fecha_subida,
+                   u.nombre AS autor
+            FROM documentos d
+            JOIN usuarios u ON u.id = d.usuario_id
+            WHERE 1 = 1
+        ";
+        $params = [];
+
+        if ($categoria !== '') {
+            $sql .= " AND d.categoria = :categoria";
+            $params[':categoria'] = $categoria;
+        }
+
+        $sql .= " ORDER BY d.fecha_subida DESC, d.id DESC";
+
+        if ($limite !== null && $limite > 0) {
+            $sql .= " LIMIT " . (int) $limite;
+        }
+
+        $db   = Database::getConnection();
+        $stmt = $db->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    // Cuántos documentos hay en cada categoría. Devuelve ['Manuales' => 3, ...]
+    public static function getConteoCategorias(): array
+    {
+        $db   = Database::getConnection();
+        $stmt = $db->query("SELECT categoria, COUNT(*) AS total FROM documentos GROUP BY categoria");
+
+        $conteos = [];
+        foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $fila) {
+            $conteos[$fila['categoria']] = (int) $fila['total'];
+        }
+        return $conteos;
+    }
+
+    // Devuelve un documento por su id (o null si no existe)
+    public static function getDocumento(int $id): ?array
+    {
+        $db   = Database::getConnection();
+        $stmt = $db->prepare("SELECT * FROM documentos WHERE id = :id");
+        $stmt->execute([':id' => $id]);
+        $fila = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $fila ?: null;
+    }
+
+    // Guarda los datos de un documento ya subido. Devuelve su id.
+    public static function crearDocumento(int $usuarioId, string $categoria, string $titulo, string $descripcion,
+                                          string $nombreArchivo, string $ruta, string $tipoMime): int
+    {
+        $db   = Database::getConnection();
+        $stmt = $db->prepare("
+            INSERT INTO documentos (usuario_id, categoria, titulo, descripcion, nombre_archivo, ruta_almacenamiento, tipo_mime)
+            VALUES (:uid, :categoria, :titulo, :descripcion, :nombre, :ruta, :mime)
+        ");
+        $stmt->execute([
+            ':uid'         => $usuarioId,
+            ':categoria'   => $categoria,
+            ':titulo'      => $titulo,
+            ':descripcion' => $descripcion,
+            ':nombre'      => $nombreArchivo,
+            ':ruta'        => $ruta,
+            ':mime'        => $tipoMime,
+        ]);
+        return (int) $db->lastInsertId();
     }
 }
