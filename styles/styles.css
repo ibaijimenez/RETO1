@@ -171,6 +171,132 @@ aside {
 }
 
 /* ==========================================================================
+   FOOTER
+   ========================================================================== */
+.footerWeb {
+    margin-top: 50px;
+    background-color: #0B0F12;
+    color: #E5E7EB;
+    border-radius: 18px;
+    padding: 28px 36px 16px;
+    font-family: var(--fuente-texto);
+}
+
+.footerTop {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr 0.9fr 1.6fr;
+    gap: 32px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #1F2933;
+}
+
+.footerMarca img {
+    height: 26px;
+    width: auto;
+    display: block;
+    margin-bottom: 12px;
+}
+
+.footerMarca p {
+    font-size: 15px;
+    color: #9CA3AF;
+    max-width: 280px;
+    line-height: 1.4;
+}
+
+.footerMarca .footerLema {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #6B7280;
+}
+
+.footerWeb h4 {
+    font-family: var(--fuente-titulo);
+    font-size: 14px;
+    color: #00B386;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 12px;
+}
+
+.footerNav {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.footerNav a {
+    color: #E5E7EB;
+    text-decoration: none;
+    font-size: 15px;
+    width: fit-content;
+}
+
+.footerNav a:hover {
+    color: #00B386;
+}
+
+.iconosRedes {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 12px;
+}
+
+.iconosRedes a {
+    color: #E5E7EB;
+    display: inline-flex;
+    transition: color 0.15s, transform 0.15s;
+}
+
+.iconosRedes a:hover {
+    color: #00B386;
+    transform: translateY(-2px);
+}
+
+.footerLugar {
+    font-size: 14px;
+    color: #9CA3AF;
+}
+
+.footerBottom {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding-top: 14px;
+    font-size: 13px;
+    color: #9CA3AF;
+}
+
+.footerMapa iframe {
+    display: block;
+    width: 100%;
+    height: 150px;
+    border: 0;
+    border-radius: 12px;
+    margin-bottom: 8px;
+}
+
+.verMapa {
+    color: #00B386;
+    font-size: 14px;
+    text-decoration: none;
+}
+
+.verMapa:hover {
+    text-decoration: underline;
+}
+
+@media (max-width: 1100px) {
+    .footerTop { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 800px) {
+    .footerTop { grid-template-columns: 1fr; }
+    .footerBottom { flex-direction: column; }
+}
+
+/* ==========================================================================
    ESTILOS DEL LOG IN
    ========================================================================== */
 .container_login {
@@ -515,22 +641,12 @@ main.inicio {
     min-width: 0;
 }
 
-/* ---- Banners ---- */
-.bannerLogo {
-    display: block;
-    width: 100%;
-    aspect-ratio: 16 / 1;      /* mucho más bajo: ~130px en una pantalla grande */
-    object-fit: cover;
-    object-position: center;
-    border-radius: 18px;
-    margin-bottom: 18px;
-}
-
+/* ---- Banner ---- */
 .bannerHola {
-    min-height: 270px;
+    min-height: 150px;
     border-radius: 18px;
-    margin-bottom: 18px;
-    padding: 28px 32px;
+    margin-bottom: 24px;
+    padding: 20px 32px;
     box-sizing: border-box;
     color: white;
     background-color: #050708;
@@ -541,28 +657,35 @@ main.inicio {
 }
 
 .bannerHolaTexto {
-    max-width: 440px;
+    max-width: 620px;
 }
 
 .bannerHola h2 {
-    font-size: 26px;
-    margin-bottom: 28px;
-}
-
-.bannerHola p {
-    font-size: 15px;
-    line-height: 1.35;
-    font-weight: bold;
+    font-size: 24px;
+    margin-bottom: 10px;
 }
 
 .bannerHola .holaPrimera {
-    margin-bottom: 36px;
+    margin-bottom: 8px;
 }
 
-.manoSaludo {
-    margin-right: 4px;
+/* ---- NUEVO: enlace "Ver todas las preguntas" ---- */
+.verMas {
+    text-align: center;
+    margin: 44px 0 44px;
 }
-
+ 
+.verMas a {
+    color: #00B386;
+    font-family: var(--fuente-titulo);
+    font-weight: 700;
+    font-size: 20px;
+    text-decoration: none;
+}
+ 
+.verMas a:hover {
+    text-decoration: underline;
+}
 .bannerVision {
     display: block;
     width: 100%;
@@ -674,26 +797,8 @@ main.inicio {
     object-fit: cover;
 }
 
-/* ---- Usuarios destacados ---- */
-.usuarioDestacado {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    margin-top: 30px;
-}
-
-.usuarioDestacado img {
-    width: 170px;
-    height: 170px;
-    border-radius: 50%;
-    object-fit: cover;
-}
-
-.usuarioDestacado span {
-    font-size: 22px;
-    font-weight: bold;
-    color: #111820;
+.columnaPreguntas .tarjetaPregunta {
+    margin-top: 37px;
 }
 
 /* ---- Pantallas pequeñas ---- */
