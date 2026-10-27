@@ -22,7 +22,11 @@
         </div>
 
         <div class="acciones">
-            <img src="img/header/campana_notificaciones.png" alt="Notificaciones">
+            <?php if (($_SESSION['rol'] ?? '') === 'admin'): ?>
+                <a href="index.php?controller=AdminController&accion=usuarios" title="Administración">
+                    <img src="img/header/estadisticas.png" alt="Administración">
+                </a>
+            <?php endif; ?>
             <img src="img/header/logo_user.png" alt="Perfil">
             <a href="index.php?pagina=login" class="btnSalir" title="Cerrar sesión">
                 <img src="img/header/exit.png" alt="Salir">

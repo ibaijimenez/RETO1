@@ -346,4 +346,106 @@ class AergibideModel {
         ]);
         return (int) $db->lastInsertId();
     }
+        // ==================================================================
+    // ADMIN
+    // ==================================================================
+
+    public static function getUsuarios(): array
+    {
+        $db   = Database::getConnection();
+        $stmt = $db->query("SELECT id, nombre, email, rol, fecha_registro FROM usuarios ORDER BY id");
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public static function getUsuario(int $id): ?array
+    {
+        $db   = Database::getConnection();
+        $stmt = $db->prepare("SELECT id, nombre, email, rol FROM usuarios WHERE id = :id");
+        $stmt->execute([':id' => $id]);
+        $fila = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $fila ?: null;
+    }
+
+    public static function crearUsuario(string $nombre, string $email, string $passwd, string $rol): bool
+    {
+        $db   = Database::getConnection();
+        $stmt = $db->prepare("INSERT INTO usuarios (nombre, email, passwd, rol) VALUES (:nombre, :email, :passwd, :rol)");
+        return $stmt->execute([
+            ':nombre' => $nombre,
+            ':email'  => $email,
+            ':passwd' => $passwd,
+            ':rol'    => $rol,
+        ]);
+    }
+    public static function eliminarPregunta(int $id): ?int
+{
+    $db = Database::getConnection();
+
+    $stmt = $db->prepare("SELECT usuario_id FROM preguntas WHERE id = :id");
+    $stmt->execute([':id' => $id]);
+    $autorId = $stmt->fetchColumn();
+    if ($autorId === false) {
+        return null;
+    }
+
+    try {
+        $db->beginTransaction();
+
+        $db->prepare("DELETE FROM respuesta_likes WHERE respuesta_id IN (SELECT id FROM respuestas WHERE pregunta_id = :id)")
+           ->execute([':id' => $id]);
+        $db->prepare("DELETE FROM respuestas WHERE pregunta_id = :id")->execute([':id' => $id]);
+        $db->prepare("DELETE FROM pregunta_likes WHERE pregunta_id = :id")->execute([':id' => $id]);
+        $db->prepare("DELETE FROM preguntas_guardadas WHERE pregunta_id = :id")->execute([':id' => $id]);
+        $db->prepare("DELETE FROM pregunta_temas WHERE pregunta_id = :id")->execute([':id' => $id]);
+        $db->prepare("DELETE FROM preguntas WHERE id = :id")->execute([':id' => $id]);
+
+        $db->commit();
+        return (int) $autorId;
+    } catch (Throwable $e) {
+        if ($db->inTransaction()) {
+            $db->rollBack();
+        }
+        throw $e;
+    }
+}
+public static function getRespuestasPorUsuario(int $usuarioId): array
+{
+    $db   = Database::getConnection();
+    $stmt = $db->prepare("
+        SELECT r.id, r.pregunta_id, r.contenido, r.fecha_creacion,
+               p.titulo AS pregunta_titulo,
+               (SELECT COUNT(*) FROM respuesta_likes x WHERE x.respuesta_id = r.id) AS likes
+        FROM respuestas r
+        JOIN preguntas p ON p.id = r.pregunta_id
+        WHERE r.usuario_id = :uid
+        ORDER BY r.fecha_creacion DESC, r.id DESC
+    ");
+    $stmt->execute([':uid' => $usuarioId]);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+public static function eliminarRespuesta(int $id): ?int
+{
+    $db = Database::getConnection();
+
+    $stmt = $db->prepare("SELECT usuario_id FROM respuestas WHERE id = :id");
+    $stmt->execute([':id' => $id]);
+    $autorId = $stmt->fetchColumn();
+    if ($autorId === false) {
+        return null;
+    }
+
+    try {
+        $db->beginTransaction();
+        $db->prepare("DELETE FROM respuesta_likes WHERE respuesta_id = :id")->execute([':id' => $id]);
+        $db->prepare("DELETE FROM respuestas WHERE id = :id")->execute([':id' => $id]);
+        $db->commit();
+        return (int) $autorId;
+    } catch (Throwable $e) {
+        if ($db->inTransaction()) {
+            $db->rollBack();
+        }
+        throw $e;
+    }
+}
 }

@@ -27,9 +27,11 @@ document.addEventListener('click', async function (e) {
         // Estado (lo pinta el CSS con aria-pressed)
         btn.setAttribute('aria-pressed', resultado.activo ? 'true' : 'false');
 
-        // Contador de likes, si este botón tiene uno al lado
-        const num = btn.parentElement.querySelector('.numLikes');
-        if (num) num.textContent = resultado.total;
+        // Contador de likes: SOLO en los botones de like
+        if (btn.dataset.tipo === 'pregunta_like' || btn.dataset.tipo === 'respuesta_like') {
+            const num = btn.parentElement.querySelector('.numLikes');
+            if (num) num.textContent = resultado.total;
+        }
 
         // Texto que cambia (Guardar / Guardada)
         const texto = btn.querySelector('.textoAccion[data-on]');
