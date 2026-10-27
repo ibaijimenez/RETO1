@@ -152,6 +152,7 @@
                         </div>
                     </div>
                 </article>
+            <?php endforeach; ?>
             
         <!-- cpestaña de guardados -->
         <div id="guardados" class="seccionPestana" style="display: none;">
@@ -187,6 +188,7 @@
                         </div>
                     </div>
                 </article>
+            <?php endforeach; ?>
             
         <!-- pestaña de informacion  -->
         <div id="informacion" class="seccionPestana" style="display: none;">
