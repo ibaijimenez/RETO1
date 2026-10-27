@@ -239,6 +239,9 @@
 
 </main>
 
+<script src="JavaScript/pestanas.js"></script>
+
+
 </body>
 </html>
 
