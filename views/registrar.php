@@ -5,6 +5,7 @@
     <base href="/RETO1/">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Aergibide SL - Registrarse</title>
+    <link rel="icon" type="image/png" href="img/header/favicon/favicon_registro.png">
     <link rel="stylesheet" href="styles/styles.css">
 </head>
 <body>
@@ -33,7 +34,7 @@
                 <!-- para ostrar error en caso de detercat un error -->
                 <?php if (!empty($error)): ?>
                     <p style="color: red; font-weight: bold; text-align: center; background-color: #ffe6e6; padding: 10px; border-radius: 5px;">
-                        <?= htmlspecialchars($error); ?>
+                        <?= $error; ?>
                     </p>
                 <?php endif; ?>
 
@@ -43,14 +44,14 @@
                     <div class="campoLogin">
                         <img src="img/registrar/perfil.png" alt="">
                         <input type="text" id="nombre" name="nombre"
-                                placeholder="Tu nombre" value="<?= htmlspecialchars($nombre ?? ''); ?>" required>
+                               placeholder="Tu nombre" required>
                     </div>
 
                     <label for="apellidos">Apellidos</label>
                     <div class="campoLogin">
                         <img src="img/registrar/perfil.png" alt="">
                         <input type="text" id="apellidos" name="apellidos"
-                               placeholder="tu@gmail.com" value="<?= htmlspecialchars($correo ?? ''); ?>" required>
+                               placeholder="Tus apellidos" required>
                     </div>
 
                     <label for="correo">Correo electrónico</label>
@@ -103,7 +104,7 @@
 
                 <p class="registroLogin">
                     ¿Ya tienes cuenta?
-                    <a href="index.php?controller=loginController&accion=index" class="registrar">Inicia sesión</a>
+                    <a href="index.php?pagina=login" class="regigit branchstrar">Inicia sesión</a>
                 </p>
 
             </div>

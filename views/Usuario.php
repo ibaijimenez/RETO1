@@ -77,7 +77,7 @@
 
                     <div class="infoPregunta">
                         <div class="respuestasPregunta">
-                            <img class="iconoInfo" src="<?= $img; ?>iconoPregunta.png" alt="">
+                            <img class="iconoInfo" src="img/aside/preguntas_verde.png" alt="">
                             <span><?= $p['respuestas']; ?> respuestas</span>
                         </div>
 

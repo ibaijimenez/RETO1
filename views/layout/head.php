@@ -5,6 +5,7 @@
     <base href="/RETO1/">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Aergibide SL</title>
+    <link rel="icon" type="image/png" href="img/header/favicon/favicon_aergibide.png">
     <link rel="stylesheet" href="styles/styles.css">
 </head>
 <body>
@@ -22,11 +23,19 @@
 
         <div class="acciones">
             <img src="img/header/campana_notificaciones.png" alt="Notificaciones">
-            <a href="index.php?controller=usuarioController&accion=perfil" class="btnPerfil" title="Mi perfil">
-                <img src="img/header/logo_user.png" alt="Perfil">
-            </a>
+          
+            <?php if (($_SESSION['rol'] ?? '') === 'admin'): ?>
+                <a href="index.php?controller=AdminController&accion=usuarios" title="Administración">
+                    <img src="img/header/estadisticas.png" alt="Administración">
+                </a>
+            <?php endif; ?>
+
             <a href="index.php?pagina=login" class="btnSalir" title="Cerrar sesión">
                 <img src="img/header/exit.png" alt="Salir">
+            </a>
+          
+          <a href="index.php?controller=usuarioController&accion=perfil" class="btnPerfil" title="Mi perfil">
+                <img src="img/header/logo_user.png" alt="Perfil">
             </a>
         </div>
 

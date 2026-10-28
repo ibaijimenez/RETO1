@@ -18,6 +18,7 @@ class loginController extends BaseController {
             if ($usuario) {
                 $_SESSION['usuario_id'] = $usuario->id;
                 $_SESSION['nombre']     = $usuario->nombre;
+                $_SESSION['rol']        = $usuario->rol;
                 header('Location: index.php?controller=AergibideController&accion=inicio');
                 exit;
             }

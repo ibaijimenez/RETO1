@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <base href="/RETO1/">
     <title>Aergibide SL - Iniciar sesión</title>
+    <link rel="icon" type="image/png" href="img/header/favicon/favicon_inicio.png">
     <link rel="stylesheet" href="styles/styles.css">
 </head>
 <body>
@@ -59,12 +60,7 @@
 
                 <p class="registroLogin">
                     ¿No tienes cuenta?
-
-
-                    <a href="index.php?controller=registroController&accion=index" class="registrar">Regístrate</a>
-
-
-
+                    <a href="views/registrar.php" class="registrar">Regístrate</a>
 
             </div>
         </div>

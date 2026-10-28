@@ -10,36 +10,53 @@ const ICONOS = {
     }
 };
 
-document.querySelectorAll('.btnToggle').forEach(function (boton) {
+// Tipo del botón -> tipo que entiende el servidor (AergibideModel::alternar)
+const TIPOS = {
+    like:    'pregunta_like',
+    guardar: 'pregunta_guardar'
+};
 
-    boton.addEventListener('click', function () {
+document.addEventListener('click', async function (e) {
+    const boton = e.target.closest('.btnToggle');
+    if (!boton || boton.disabled) return;
 
-        const tipo     = boton.dataset.tipo;   // "like" o "guardar"
-        const estabaOn = boton.getAttribute('aria-pressed') === 'true';
-        const ahoraOn  = !estabaOn;
+    // Sin data-id (por ejemplo, datos de ejemplo) no hay nada que guardar
+    if (!boton.dataset.id) return;
 
-        // Cambiar el estado y la imagen
-        boton.setAttribute('aria-pressed', ahoraOn);
-        boton.querySelector('img').src = ICONOS[tipo][ahoraOn ? 'on' : 'off'];
+    const tipo = boton.dataset.tipo;   // "like" o "guardar"
+    boton.disabled = true;             // evita dobles clics mientras responde el servidor
 
-        // Si es un "me gusta", sumar o restar uno al contador
+    try {
+        const datos = new FormData();
+        datos.append('tipo', TIPOS[tipo]);
+        datos.append('id', boton.dataset.id);
+
+        const respuesta = await fetch('index.php?controller=PreguntasController&accion=alternar', {
+            method: 'POST',
+            body: datos
+        });
+
+        if (respuesta.status === 401) {
+            window.location.href = 'index.php';   // sesión caducada: al login
+            return;
+        }
+        if (!respuesta.ok) throw new Error('Error del servidor');
+
+        const resultado = await respuesta.json();
+
+        // Estado e icono según lo que dice la base de datos
+        boton.setAttribute('aria-pressed', resultado.activo ? 'true' : 'false');
+        boton.querySelector('img').src = ICONOS[tipo][resultado.activo ? 'on' : 'off'];
+
+        // Contador de likes real
         if (tipo === 'like') {
             const contador = boton.parentElement.querySelector('.numLikes');
-            contador.textContent = parseInt(contador.textContent, 10) + (ahoraOn ? 1 : -1);
+            if (contador) contador.textContent = resultado.total;
         }
-    });
-});
-
-
-document.addEventListener('click', function (e) {
-    var boton = e.target.closest('.btnLike');
-    if (!boton) return;
-
-    var datos = new FormData();
-    datos.append('pregunta_id', boton.dataset.id);
-
-    fetch('index.php?controller=AergibideController&accion=like', {
-        method: 'POST',
-        body: datos
-    });
+    } catch (err) {
+        console.error(err);
+        alert('No se ha podido guardar. Inténtalo de nuevo.');
+    } finally {
+        boton.disabled = false;
+    }
 });

@@ -171,6 +171,132 @@ aside {
 }
 
 /* ==========================================================================
+   FOOTER
+   ========================================================================== */
+.footerWeb {
+    margin-top: 50px;
+    background-color: #0B0F12;
+    color: #E5E7EB;
+    border-radius: 18px;
+    padding: 28px 36px 16px;
+    font-family: var(--fuente-texto);
+}
+
+.footerTop {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr 0.9fr 1.6fr;
+    gap: 32px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #1F2933;
+}
+
+.footerMarca img {
+    height: 26px;
+    width: auto;
+    display: block;
+    margin-bottom: 12px;
+}
+
+.footerMarca p {
+    font-size: 15px;
+    color: #9CA3AF;
+    max-width: 280px;
+    line-height: 1.4;
+}
+
+.footerMarca .footerLema {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #6B7280;
+}
+
+.footerWeb h4 {
+    font-family: var(--fuente-titulo);
+    font-size: 14px;
+    color: #00B386;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 12px;
+}
+
+.footerNav {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.footerNav a {
+    color: #E5E7EB;
+    text-decoration: none;
+    font-size: 15px;
+    width: fit-content;
+}
+
+.footerNav a:hover {
+    color: #00B386;
+}
+
+.iconosRedes {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 12px;
+}
+
+.iconosRedes a {
+    color: #E5E7EB;
+    display: inline-flex;
+    transition: color 0.15s, transform 0.15s;
+}
+
+.iconosRedes a:hover {
+    color: #00B386;
+    transform: translateY(-2px);
+}
+
+.footerLugar {
+    font-size: 14px;
+    color: #9CA3AF;
+}
+
+.footerBottom {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding-top: 14px;
+    font-size: 13px;
+    color: #9CA3AF;
+}
+
+.footerMapa iframe {
+    display: block;
+    width: 100%;
+    height: 150px;
+    border: 0;
+    border-radius: 12px;
+    margin-bottom: 8px;
+}
+
+.verMapa {
+    color: #00B386;
+    font-size: 14px;
+    text-decoration: none;
+}
+
+.verMapa:hover {
+    text-decoration: underline;
+}
+
+@media (max-width: 1100px) {
+    .footerTop { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 800px) {
+    .footerTop { grid-template-columns: 1fr; }
+    .footerBottom { flex-direction: column; }
+}
+
+/* ==========================================================================
    ESTILOS DEL LOG IN
    ========================================================================== */
 .container_login {
@@ -515,22 +641,12 @@ main.inicio {
     min-width: 0;
 }
 
-/* ---- Banners ---- */
-.bannerLogo {
-    display: block;
-    width: 100%;
-    aspect-ratio: 16 / 1;      /* mucho más bajo: ~130px en una pantalla grande */
-    object-fit: cover;
-    object-position: center;
-    border-radius: 18px;
-    margin-bottom: 18px;
-}
-
+/* ---- Banner ---- */
 .bannerHola {
-    min-height: 270px;
+    min-height: 150px;
     border-radius: 18px;
-    margin-bottom: 18px;
-    padding: 28px 32px;
+    margin-bottom: 24px;
+    padding: 20px 32px;
     box-sizing: border-box;
     color: white;
     background-color: #050708;
@@ -541,28 +657,35 @@ main.inicio {
 }
 
 .bannerHolaTexto {
-    max-width: 440px;
+    max-width: 620px;
 }
 
 .bannerHola h2 {
-    font-size: 26px;
-    margin-bottom: 28px;
-}
-
-.bannerHola p {
-    font-size: 15px;
-    line-height: 1.35;
-    font-weight: bold;
+    font-size: 24px;
+    margin-bottom: 10px;
 }
 
 .bannerHola .holaPrimera {
-    margin-bottom: 36px;
+    margin-bottom: 8px;
 }
 
-.manoSaludo {
-    margin-right: 4px;
+/* ---- NUEVO: enlace "Ver todas las preguntas" ---- */
+.verMas {
+    text-align: center;
+    margin: 44px 0 44px;
 }
-
+ 
+.verMas a {
+    color: #00B386;
+    font-family: var(--fuente-titulo);
+    font-weight: 700;
+    font-size: 20px;
+    text-decoration: none;
+}
+ 
+.verMas a:hover {
+    text-decoration: underline;
+}
 .bannerVision {
     display: block;
     width: 100%;
@@ -674,26 +797,8 @@ main.inicio {
     object-fit: cover;
 }
 
-/* ---- Usuarios destacados ---- */
-.usuarioDestacado {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    margin-top: 30px;
-}
-
-.usuarioDestacado img {
-    width: 170px;
-    height: 170px;
-    border-radius: 50%;
-    object-fit: cover;
-}
-
-.usuarioDestacado span {
-    font-size: 22px;
-    font-weight: bold;
-    color: #111820;
+.columnaPreguntas .tarjetaPregunta {
+    margin-top: 37px;
 }
 
 /* ---- Pantallas pequeñas ---- */
@@ -1257,4 +1362,436 @@ main.detallePregunta h1 {
     .metaDetalle { flex-direction: column; align-items: flex-start; }
     .formRespuesta .btnPublicar { width: 100%; justify-content: center; }
     .btnFavorita { font-size: 15px; padding: 7px 16px 7px 12px; }
+}
+
+/* ==========================================================================
+   ESTILOS DE FAVORITOS
+   ========================================================================== */
+.cabeceraFavoritos {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    margin-bottom: 22px;
+}
+
+.cabeceraFavoritos h1 {
+    font-size: 48px;
+    color: #000;
+    margin-bottom: 6px;
+}
+
+.iconoFavoritos {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.iconoFavoritos img {
+    width: 64px;
+    height: auto;
+    display: block;
+}
+
+@media (max-width: 900px) {
+    .cabeceraFavoritos { gap: 16px; }
+    .cabeceraFavoritos h1 { font-size: 34px; }
+    .iconoFavoritos img { width: 48px; }
+}
+
+/* ==========================================================================
+   FAVORITOS: tarjetas de pregunta y respuesta
+   ========================================================================== */
+.tarjetaFavorito { margin-bottom: 28px; }
+
+.respuestaEn {
+    font-size: 16px;
+    color: #777E86;
+    margin-bottom: 10px;
+}
+.respuestaEn a {
+    color: #00A67E;
+    text-decoration: none;
+    font-weight: 600;
+}
+.respuestaEn a:hover { text-decoration: underline; }
+
+.respuestaFavTexto {
+    font-size: 19px;
+    line-height: 1.5;
+    color: #111820;
+    margin-bottom: 20px;
+}
+
+.tarjetaFavorito .tarjetaCabecera h3 a {
+    color: inherit;
+    text-decoration: none;
+}
+
+/* ==========================================================================
+   ESTILOS DE DOCUMENTOS  (pegar al final de styles.css)
+   Si ya habías pegado el bloque de Documentos de antes, BÓRRALO primero.
+   ========================================================================== */
+
+button.btnNuevaPregunta {
+    border: none;
+    cursor: pointer;
+}
+
+.tituloDocs {
+    font-size: 30px;
+    color: #000;
+    margin: 28px 0 16px;
+}
+
+/* ---- Colores de cada categoría ---- */
+.catVerde    { --color: #00B386; --fondo: #DDF4EC; }
+.catAzul     { --color: #1E88E5; --fondo: #DCEBFB; }
+.catMorado   { --color: #8B2FE0; --fondo: #EBDDFB; }
+.catAmarillo { --color: #E0A200; --fondo: #FBEFC8; }
+
+/* ---- Tarjetas de categoría ---- */
+.gridCategorias {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 24px;
+}
+
+.tarjetaCategoria {
+    display: block;
+    background-color: white;
+    border: 1px solid #E5E7EB;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    text-decoration: none;
+    color: #111820;
+    transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.tarjetaCategoria:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.18);
+}
+
+.tarjetaCategoria.catActiva {
+    border-color: var(--color);
+    box-shadow: 0 0 0 2px var(--color);
+}
+
+.iconoCategoria {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 54px;
+    height: 54px;
+    border-radius: 12px;
+    background-color: var(--fondo);
+    color: var(--color);
+    margin-bottom: 16px;
+}
+
+.tarjetaCategoria h3 {
+    font-size: 18px;
+    margin-bottom: 6px;
+}
+
+.tarjetaCategoria p {
+    font-size: 15px;
+    color: #374151;
+    margin-bottom: 14px;
+}
+
+.totalCategoria {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color);
+}
+
+.flechaCategoria {
+    font-size: 22px;
+    line-height: 1;
+}
+
+/* ---- Tabla ---- */
+.cabeceraTabla {
+    display: flex;
+    align-items: baseline;
+    gap: 20px;
+}
+
+.verTodos {
+    color: #00A67E;
+    font-size: 17px;
+    text-decoration: none;
+}
+
+.verTodos:hover {
+    text-decoration: underline;
+}
+
+.tablaWrap {
+    overflow-x: auto;
+}
+
+.tablaDocs {
+    width: 100%;
+    min-width: 900px;
+    border-collapse: collapse;
+    font-size: 15px;
+}
+
+.tablaDocs th {
+    text-align: left;
+    font-family: var(--fuente-texto);
+    font-weight: 700;
+    font-size: 16px;
+    color: #111820;
+    padding: 10px 12px;
+}
+
+.tablaDocs td {
+    padding: 12px;
+    vertical-align: middle;
+    color: #111820;
+}
+
+.celdaNombre {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.celdaNombre strong {
+    display: block;
+    font-weight: 600;
+}
+
+.descDoc {
+    display: block;
+    color: #6B7280;
+    font-size: 14px;
+}
+
+.textoGris {
+    color: #6B7280;
+}
+
+.celdaAutor {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.celdaAutor img {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+}
+
+/* Icono del tipo de archivo (cuadrado de color con las letras) */
+.iconoArchivo {
+    flex-shrink: 0;
+    width: 40px;
+    height: 44px;
+    border-radius: 6px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 6px;
+    box-sizing: border-box;
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.archPdf   { background-color: #C62828; }
+.archExcel { background-color: #1D7B45; }
+.archDoc   { background-color: #1A5FD0; }
+.archImg   { background-color: #8B2FE0; }
+.archOtro  { background-color: #6B7280; }
+
+/* Pastilla de categoría */
+/* Pastilla de categoría */
+.pillCategoria {
+    display: inline-block;
+    width: 180px;               /* mismo ancho para todas */
+    box-sizing: border-box;
+    text-align: center;
+    padding: 4px 12px;
+    border-radius: 20px;
+    border: 1px solid var(--color);
+    background-color: var(--fondo);
+    color: var(--color);
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;    /* si algún día hay una categoría muy larga, pone "..." */
+}
+.btnDescargarIcono {
+    display: inline-flex;
+    padding: 4px;
+    border-radius: 8px;
+}
+
+.btnDescargarIcono:hover {
+    background-color: #F3F4F6;
+}
+
+/* ---- Ventana "Subir nuevo documento" ---- */
+.modalSubir {
+    width: 640px;
+    max-width: 92vw;
+    border: none;
+    margin: auto;
+    border-radius: 22px;
+    padding: 30px 36px 28px;
+    box-sizing: border-box;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35);
+    font-family: var(--fuente-texto);
+}
+
+.modalSubir::backdrop {
+    background-color: rgba(0, 0, 0, 0.45);
+}
+
+.modalSubir h2 {
+    font-size: 34px;
+    color: #111820;
+    margin: 24px 0 18px;
+}
+
+.cerrarModal {
+    position: absolute;
+    top: 18px;
+    right: 24px;
+    background: none;
+    border: none;
+    font-size: 34px;
+    line-height: 1;
+    color: #6B7280;
+    cursor: pointer;
+}
+
+.cerrarModal:hover {
+    color: #111820;
+}
+
+.modalSubir label {
+    display: block;
+    font-family: var(--fuente-titulo);
+    font-weight: 700;
+    font-size: 20px;
+    color: #111820;
+    margin: 14px 0 6px;
+}
+
+.modalSubir input[type="text"],
+.modalSubir select {
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid #BFC3C7;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-family: var(--fuente-texto);
+    font-size: 18px;
+    color: #30363D;
+    background-color: white;
+    outline: none;
+}
+
+.modalSubir input[type="text"]:focus,
+.modalSubir select:focus {
+    border-color: #00B386;
+}
+
+.modalSubir input:disabled {
+    background-color: #F3F4F6;
+    color: #6B7280;
+}
+
+.modalSubir ::placeholder {
+    color: #777E86;
+}
+
+.filaDos {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+/* Zona de arrastrar archivo: el input ocupa toda la caja pero es invisible */
+.zonaCarga {
+    position: relative;
+    text-align: center;
+    background-color: #E8F7F4;
+    border: 2px dashed #111820;
+    border-radius: 12px;
+    padding: 22px 16px;
+}
+
+.zonaCarga input[type="file"] {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.zonaCarga p {
+    font-size: 18px;
+    line-height: 1.4;
+    color: #111820;
+}
+
+.archivoElegido {
+    margin-top: 8px;
+    font-weight: 700;
+    color: #00A67E;
+}
+
+.modalSubir .erroresForm {
+    margin: 0 0 8px;
+}
+
+.botonesModal {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 22px;
+}
+
+.btnCancelarModal,
+.btnSubirModal {
+    border: none;
+    border-radius: 10px;
+    padding: 10px 24px;
+    font-family: var(--fuente-titulo);
+    font-weight: 700;
+    font-size: 20px;
+    color: white;
+    cursor: pointer;
+}
+
+.btnCancelarModal       { background-color: #6B7280; }
+.btnCancelarModal:hover { background-color: #4B5563; }
+.btnSubirModal          { background-color: #00B386; }
+.btnSubirModal:hover    { background-color: #009D76; }
+
+/* ---- Pantallas pequeñas ---- */
+@media (max-width: 1100px) {
+    .gridCategorias {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 600px) {
+    .gridCategorias { grid-template-columns: 1fr; }
+    .filaDos        { grid-template-columns: 1fr; }
+    .modalSubir     { padding: 24px 20px; }
 }
