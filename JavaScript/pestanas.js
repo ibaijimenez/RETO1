@@ -5,7 +5,7 @@ function cambiarPestana(nombrePestana, botonPulsado) {
 
     document.getElementById(nombrePestana).style.display = 'block';
 
-    let botones = document.querySelectorAll('.pestana-btn');
+    let botones = document.querySelectorAll('.pestanaBtn');
     botones.forEach(btn => btn.classList.remove('activa'));
     
     botonPulsado.classList.add('activa');
