@@ -36,7 +36,7 @@ $menu_items = [
         <div class="usuario-aside">
             <a href="index.php?controller=UsuarioController&accion=perfil">
                 <img src="img/aside/logo_usuarios.png" alt="Usuario">
-                <span>Carlos Martín</span>
+                <span><?= htmlspecialchars($_SESSION['nombre'] ?? 'Usuario'); ?></span>
             </a>
         </div>
     </aside>
