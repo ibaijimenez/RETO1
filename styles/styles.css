@@ -1795,3 +1795,85 @@ button.btnNuevaPregunta {
     .filaDos        { grid-template-columns: 1fr; }
     .modalSubir     { padding: 24px 20px; }
 }
+/* ==========================================================================
+   ESTILOS DE PERFIL DE USUARIO
+   (reutiliza cabeceraFavoritos, tarjetaPregunta, tarjetaPie, btnToggle...)
+   ========================================================================== */
+
+/* El nombre es más pequeño que el h1 de Favoritos */
+.perfil .cabeceraFavoritos { margin-bottom: 0; }
+.perfil .cabeceraFavoritos h1 { font-size: 28px; margin-bottom: 0; }
+
+/* Contadores */
+.datosContador {
+    display: flex;
+    justify-content: space-around;
+    max-width: 640px;
+    margin: 18px auto 26px;
+}
+.dato { display: flex; flex-direction: column; align-items: center; }
+.dato .numero { font-family: var(--fuente-titulo); font-weight: 700; font-size: 20px; color: #111820; }
+.dato .label  { font-family: var(--fuente-titulo); font-weight: 700; font-size: 14px; color: #6B7280; }
+
+/* Pestañas */
+.apartados {
+    display: flex;
+    justify-content: center;
+    gap: 36px;
+    border-bottom: 1px solid #BFC3C7;
+}
+.pestanaBtn {
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    padding: 8px 10px;
+    margin-bottom: -1px;
+    font-family: var(--fuente-titulo);
+    font-weight: 700;
+    font-size: 16px;
+    color: #111820;
+    cursor: pointer;
+}
+.pestanaBtn:hover { color: #00B386; }
+.pestanaBtn.activa { color: #00B386; border-bottom-color: #00B386; }
+
+/* Lista */
+.listaPreguntas { max-width: 820px; margin-top: 28px; }
+
+/* Papelera */
+.btnEliminar img { width: 22px; height: 22px; object-fit: contain; }
+.btnEliminar:hover { opacity: 0.6; }
+
+/* Pestaña Información */
+.formInformacion { display: flex; flex-direction: column; gap: 22px; }
+
+.campoInfo label {
+    display: block;
+    font-weight: 700;
+    font-size: 16px;
+    color: #111820;
+    margin-bottom: 8px;
+}
+.campoValor {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    max-width: 440px;
+    margin-left: 22px;
+    padding: 8px 14px;
+    box-sizing: border-box;
+    background-color: #00B386;
+    border-radius: 6px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+}
+.campoValor input {
+    flex: 1;
+    min-width: 0;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: white;
+    font-size: 15px;
+    font-weight: 600;
+}
+.campoValor .btnGuardar img { width: 20px; height: 20px; }
