@@ -22,7 +22,9 @@
 
         <div class="acciones">
             <img src="img/header/campana_notificaciones.png" alt="Notificaciones">
-            <img src="img/header/logo_user.png" alt="Perfil">
+            <a href="index.php?controller=usuarioController&accion=perfil" class="btnPerfil" title="Mi perfil">
+                <img src="img/header/logo_user.png" alt="Perfil">
+            </a>
             <a href="index.php?pagina=login" class="btnSalir" title="Cerrar sesión">
                 <img src="img/header/exit.png" alt="Salir">
             </a>
