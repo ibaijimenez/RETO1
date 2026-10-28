@@ -90,8 +90,8 @@
                     <label class="aceptoTerminos">
                         <input type="checkbox" name="terminos" required>
                         <span>
-                            Acepto la <a href="#" class="registrar">política de privacidad</a>
-                            y los <a href="#" class="registrar">términos de uso</a>.
+                            Acepto la <a href="pdf/politica_privacidad.pdf" class="registrar">política de privacidad</a>
+                            y los <a href="pdf/terminos_de_uso.pdf" class="registrar">términos de uso</a>.
                         </span>
                     </label>
 
