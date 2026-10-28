@@ -1,96 +1,38 @@
 <?php
     $pagina_activa = 'usuario';
-
-    // para pestaña seleccionada
-    $pestana = $_GET['pestana'] ?? 'preguntas';
+    $img = 'img/main/';
 
     // apartado informacion usuario
-    $usuario = [
-            'nombre'       => 'Carlos Martín',
-            'puesto'       => 'Ingeniera de I+D+i',
-            'departamento' => 'Departamento de Análisis Estructural y Materiales',
-            'ubicacion'    => 'Vitoria-Gasteiz, Álava',
-            'email'        => 'l.garcia@aergibide.com',
-            'avatar'       => 'img/usuario/perfil_grande.png'
+    $nombre = $datosUsuario['nombre'] ?? ($_SESSION['nombre'] ?? 'Usuario');
+    $email  = $datosUsuario['email']  ?? '';
+    
+    // La BD todavía no guarda puesto / departamento / ubicación: valores de ejemplo
+    $puesto       = 'Ingeniera de I+D+i';
+    $departamento = 'Departamento de Análisis Estructural y Materiales';
+    $ubicacion    = 'Vitoria-Gasteiz, Álava';
+    
+    $campos = [
+        'Nombre y Apellidos:' => $nombre,
+        'Puesto:'             => $puesto,
+        'Departamento:'       => $departamento,
+        'Ubicación:'          => $ubicacion,
+        'Email:'              => $email,
     ];
-
-    // apartado las preguntas piblicadaas del usuario
-    $mis_preguntas = [
-        [
-            'titulo'     => '¿Alguien ha trabajado con el material Ti6Al4V en procesos de mecanizado?',
-            'etiquetas'  => ['Materiales', 'Mecanizado', 'Ti6Al4V'],
-            'respuestas' => 7,
-            'likes'      => 4,
-            'fecha'      => '02/08/2026'
-        ],
-        [
-            'titulo'     => '¿Alguien ha trabajado con el material Ti6Al4V en procesos de mecanizado?',
-            'etiquetas'  => ['Materiales', 'Mecanizado', 'Ti6Al4V'],
-            'respuestas' => 10,
-            'likes'      => 6,
-            'fecha'      => '23/04/2026'
-        ],
-        [
-            'titulo'     => '¿Qué bibliotecas recomendáis para el análisis de vibraciones en turbinas?',
-            'etiquetas'  => ['Motores', 'Turbinas', 'Carbono'],
-            'respuestas' => 2,
-            'likes'      => 12,
-            'fecha'      => '20/06/2026'
-        ],
-        [
-            'titulo'     => '¿Cómo mejorar la precisión de los sensores de temperatura en ensayos de laboratorio?',
-            'etiquetas'  => ['Instrumentación', 'Sensores', 'Ensayos'],
-            'respuestas' => 4,
-            'likes'      => 23,
-            'fecha'      => '22/11/2026'
-        ]
-    ];
-
-    // apartado de preguntas guardadas del usuario
-    $preguntas_guardadas = [
-        [
-            'titulo'    => '¿Cómo mejorar la precisión de los sensores de temperatura en ensayos de laboratorio?',
-            'etiquetas' => ['Instrumentación', 'Sensores', 'Ensayos'],
-            'autor'     => 'Elena Ruiz',
-            'likes'     => 23,
-            'fecha'     => '22/11/2026',
-            'me_gusta' => true,
-            'guardada'  => true,
-        ],
-        [
-            'titulo'    => '¿Cómo podemos reducir el peso de una estructura aeronáutica sin comprometer su resistencia?',
-            'etiquetas' => ['Materiales', 'Diseño estructural', 'Aeronáutica'],
-            'autor'     => 'Ana Torres',
-            'likes'     => 9,
-            'fecha'     => '13/10/2026',
-            'me_gusta' => true,
-            'guardada'  => true,
-        ],
-        [
-            'titulo'    => '¿Alguien ha trabajado con el material Ti6Al4V en procesos de mecanizado?',
-            'etiquetas' => ['Materiales', 'Mecanizado', 'Ti6Al4V'],
-            'autor'     => 'Pablo López',
-            'likes'     => 4,
-            'fecha'     => '02/08/2026',
-            'me_gusta' => true,
-            'guardada'  => true,
-        ],
-    ];
-
-    $img = 'img/main/';
+  
+    
     require __DIR__ . '/layout/head.php';
     require __DIR__ . '/layout/sidebar.php';
 ?>
 
 
-<main class="perfil">
+<main class="inicio perfil">
 <!-- PARTE SUPERIOR -->
     <!-- cabecera de la pagina: foto perfil, nombre, contador de guardados y preguntas -->
     <section class="cabeceraPerfil">
         <div class="foto">
-            <img src="img/aside/logo_usuarios.png" alt="Avatar de <?= ($usuario['nombre']); ?>"><!-- la imagen -->
+            <img src="img/aside/logo_usuarios.png" alt="Imagen de <?= $nombre; ?>"><!-- la imagen -->
         </div>
-        <h1 class="nombreUser"><?= $usuario['nombre']; ?></h1><!-- nombre del usuario -->
+        <h1 class="nombreUser"><?= $nombre; ?></h1><!-- nombre del usuario -->
 
         <!-- para los contadores de pruntas del usuario y gpreguntas guardadas -->
         <div class="datosContador">
@@ -106,9 +48,9 @@
 
         <!-- los tres apartados: preguntas, favoritos, informacion -->
         <div class="apartados">
-            <button type="button" class="pestana-btn activa" onclick="cambiarPestana('preguntas', this)">Preguntas</button>
-            <button type="button" class="pestana-btn" onclick="cambiarPestana('guardados', this)">Guardados</button>
-            <button type="button" class="pestana-btn" onclick="cambiarPestana('informacion', this)">Información</button>
+            <button type="button" class="pestanaBtn activa" onclick="cambiarPestana('preguntas', this)">Preguntas</button>
+            <button type="button" class="pestanaBtn" onclick="cambiarPestana('guardados', this)">Guardados</button>
+            <button type="button" class="pestanaBtn" onclick="cambiarPestana('informacion', this)">Información</button>
         </div>
     </section>
 
@@ -116,6 +58,9 @@
     <div class="listaPreguntas">
         <!-- pestaña preguntas usuario activa -->
         <div id="preguntas" class="seccionPestana">
+            <?php if (empty($mis_preguntas)): ?>
+                <p class="sinResultados">Todavía no has publicado ninguna pregunta.</p>
+            <?php endif; ?>
             <?php foreach ($mis_preguntas as $p): ?>
                 <article class="tarjetaPregunta">
                     <div class="tarjetaCabecera">
@@ -123,9 +68,11 @@
                     </div>
 
                     <div class="etiquetas">
-                        <?php foreach ($p['etiquetas'] as $etiqueta): ?>
-                            <span class="etiqueta"><?= $etiqueta; ?></span>
-                        <?php endforeach; ?>
+                        <?php if (!empty($p['temas'])): ?>
+                            <?php foreach (explode('||', $p['temas']) as $tema): ?>
+                                <span class="etiqueta"><?= $tema; ?></span>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
                     </div>
 
                     <div class="infoPregunta">
@@ -141,7 +88,7 @@
 
                         <div class="fechaPregunta">
                             <img class="iconoInfo" src="<?= $img; ?>calendario 1.png" alt="">
-                            <span><?= $p['fecha']; ?></span>
+                            <span><?= date('d/m/Y', strtotime($p['fecha_creacion'])); ?></span>
                         </div>
 
                         
@@ -152,9 +99,14 @@
                         </div>
                     </div>
                 </article>
+            <?php endforeach; ?>
+        </div>
             
         <!-- cpestaña de guardados -->
         <div id="guardados" class="seccionPestana" style="display: none;">
+            <?php if (empty($preguntas_guardadas)): ?>
+                <p class="sinResultados">Todavía no has guardado ninguna pregunta.</p>
+            <?php endif; ?>
             <?php foreach ($preguntas_guardadas as $p): ?>
                 <article class="tarjetaPregunta">
                     <div class="tarjetaCabecera">
@@ -187,55 +139,31 @@
                         </div>
                     </div>
                 </article>
+            <?php endforeach; ?>
+        </div>
             
         <!-- pestaña de informacion  -->
         <div id="informacion" class="seccionPestana" style="display: none;">
             <div class="formInformacion">
-                <div class="campoInfo">
-                    <label>Nombre y Apellidos:</label>
-                    <div class="container">
-                        <input type="text" value="<?= $usuario['nombre']; ?>">
-                        <button type="button" class="btnGuardar"><img src="<?= $img; ?>iconoGuardar.png" alt="Guardar"></button>
+                <?php foreach ($campos as $titulo => $valor): ?>
+                    <div class="campoInfo">
+                     <label><?= $titulo; ?></label>
+                        <div class="container">
+                            <input type="text" value="<?= $valor; ?>">
+                            <button type="button" class="btnGuardar">
+                                <img src="<?= $img; ?>iconoGuardar.png" alt="Guardar">
+                            </button>
+                        </div>
                     </div>
-                </div>
-
-                <div class="campoInfo">
-                    <label>Puesto:</label>
-                    <div class="container">
-                        <input type="text" value="<?= $usuario['puesto']; ?>">
-                        <button type="button" class="btnGuardar"><img src="<?= $img; ?>iconoGuardar.png" alt="Guardar"></button>
-                    </div>
-                </div>
-
-                <div class="campoInfo">
-                    <label>Departamento:</label>
-                    <div class="container">
-                        <input type="text" value="<?= $usuario['departamento']; ?>">
-                        <button type="button" class="btnGuardar"><img src="<?= $img; ?>iconoGuardar.png" alt="Guardar"></button>
-                    </div>
-                </div>
-
-                <div class="campoInfo">
-                    <label>Ubicación:</label>
-                    <div class="container">
-                        <input type="text" value="<?= $usuario['ubicacion']; ?>">
-                        <button type="button" class="btnGuardar"><img src="<?= $img; ?>iconoGuardar.png" alt="Guardar"></button>
-                    </div>
-                </div>
-
-                <div class="campoInfo">
-                    <label>Email:</label>
-                    <div class="container">
-                        <input type="text" value="<?= $usuario['email']; ?>">
-                        <button type="button" class="btnGuardar"><img src="<?= $img; ?>iconoGuardar.png" alt="Guardar"></button>
-                    </div>
-                </div>
+                <?php endforeach; ?>
             </div>
-        
+         </div>
 
     </div>
 
 </main>
+
+<script src="JavaScript/pestanas.js"></script>
 
 </body>
 </html>
