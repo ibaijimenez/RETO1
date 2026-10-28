@@ -224,15 +224,39 @@ class AergibideModel {
     }
 
     // Guarda una respuesta nueva. Devuelve su id.
+          // Guarda una respuesta nueva y avisa al autor de la pregunta. Devuelve el id de la respuesta.
     public static function crearRespuesta(int $preguntaId, int $usuarioId, string $contenido): int
     {
+        $log = __DIR__ . '/../debug.txt';
+
         $db   = Database::getConnection();
         $stmt = $db->prepare("
             INSERT INTO respuestas (pregunta_id, usuario_id, contenido)
             VALUES (:pid, :uid, :contenido)
         ");
         $stmt->execute([':pid' => $preguntaId, ':uid' => $usuarioId, ':contenido' => $contenido]);
-        return (int) $db->lastInsertId();
+        $respuestaId = (int) $db->lastInsertId();
+
+        file_put_contents($log, "crearRespuesta: respuesta $respuestaId guardada\n", FILE_APPEND);
+
+        // Avisar al autor de la pregunta
+        try {
+            $stmt = $db->prepare("SELECT usuario_id FROM preguntas WHERE id = :id");
+            $stmt->execute([':id' => $preguntaId]);
+            $autor = $stmt->fetchColumn();
+
+            file_put_contents($log, "  autor=$autor actor=$usuarioId\n", FILE_APPEND);
+
+            if ($autor !== false) {
+                $msg = self::nombreUsuario($usuarioId) . ' ha respondido a tu pregunta';
+                self::crearNotificacion((int) $autor, $usuarioId, $msg, $preguntaId, $respuestaId);
+                file_put_contents($log, "  crearNotificacion ejecutada\n", FILE_APPEND);
+            }
+        } catch (Throwable $e) {
+            file_put_contents($log, "  ERROR: " . $e->getMessage() . "\n", FILE_APPEND);
+        }
+
+        return $respuestaId;
     }
 
     // Activa o desactiva un like / guardado. Devuelve el nuevo estado y el total.
@@ -263,10 +287,32 @@ class AergibideModel {
         }
         $stmt->execute([':id' => $id, ':uid' => $usuarioId]);
 
-        $stmt = $db->prepare("SELECT COUNT(*) FROM $tabla WHERE $col = :id");
+               $stmt = $db->prepare("SELECT COUNT(*) FROM $tabla WHERE $col = :id");
         $stmt->execute([':id' => $id]);
+        $total = (int) $stmt->fetchColumn();
 
-        return ['activo' => !$existe, 'total' => (int) $stmt->fetchColumn()];
+        // Solo notificamos al ACTIVAR un like (no al quitarlo ni al guardar)
+        if (!$existe) {
+            $quien = self::nombreUsuario($usuarioId);
+
+            if ($tipo === 'pregunta_like') {
+                $s = $db->prepare("SELECT usuario_id FROM preguntas WHERE id = :id");
+                $s->execute([':id' => $id]);
+                $autor = $s->fetchColumn();
+                if ($autor !== false) {
+                    self::crearNotificacion((int) $autor, $usuarioId, $quien . ' ha dado like a tu pregunta', $id);
+                }
+            } elseif ($tipo === 'respuesta_like') {
+                $s = $db->prepare("SELECT usuario_id, pregunta_id FROM respuestas WHERE id = :id");
+                $s->execute([':id' => $id]);
+                $r = $s->fetch(PDO::FETCH_ASSOC);
+                if ($r) {
+                    self::crearNotificacion((int) $r['usuario_id'], $usuarioId, $quien . ' ha dado like a tu respuesta', (int) $r['pregunta_id'], $id);
+                }
+            }
+        }
+
+        return ['activo' => !$existe, 'total' => $total];
     }
 
     // ==================================================================
@@ -397,6 +443,7 @@ class AergibideModel {
         $db->prepare("DELETE FROM pregunta_likes WHERE pregunta_id = :id")->execute([':id' => $id]);
         $db->prepare("DELETE FROM preguntas_guardadas WHERE pregunta_id = :id")->execute([':id' => $id]);
         $db->prepare("DELETE FROM pregunta_temas WHERE pregunta_id = :id")->execute([':id' => $id]);
+        $db->prepare("DELETE FROM notificaciones WHERE pregunta_id = :id")->execute([':id' => $id]);
         $db->prepare("DELETE FROM preguntas WHERE id = :id")->execute([':id' => $id]);
 
         $db->commit();
@@ -438,6 +485,7 @@ public static function eliminarRespuesta(int $id): ?int
     try {
         $db->beginTransaction();
         $db->prepare("DELETE FROM respuesta_likes WHERE respuesta_id = :id")->execute([':id' => $id]);
+        $db->prepare("DELETE FROM notificaciones WHERE respuesta_id = :id")->execute([':id' => $id]);
         $db->prepare("DELETE FROM respuestas WHERE id = :id")->execute([':id' => $id]);
         $db->commit();
         return (int) $autorId;
@@ -448,4 +496,68 @@ public static function eliminarRespuesta(int $id): ?int
         throw $e;
     }
 }
+// ==================================================================
+    // NOTIFICACIONES
+    // ==================================================================
+
+    private static function crearNotificacion(int $destino, int $actor, string $mensaje, int $preguntaId, ?int $respuestaId = null): void
+    {
+        if ($destino === $actor) {
+            return;
+        }
+
+        $db = Database::getConnection();
+
+        $stmt = $db->prepare("
+            SELECT 1 FROM notificaciones
+            WHERE usuario_id = :dest AND mensaje = :msg AND pregunta_id = :pid AND (respuesta_id <=> :rid)
+        ");
+        $stmt->execute([':dest' => $destino, ':msg' => $mensaje, ':pid' => $preguntaId, ':rid' => $respuestaId]);
+        if ($stmt->fetchColumn()) {
+            return;
+        }
+
+        $stmt = $db->prepare("
+            INSERT INTO notificaciones (usuario_id, pregunta_id, respuesta_id, mensaje)
+            VALUES (:dest, :pid, :rid, :msg)
+        ");
+        $stmt->execute([':dest' => $destino, ':pid' => $preguntaId, ':rid' => $respuestaId, ':msg' => $mensaje]);
+    }
+
+    private static function nombreUsuario(int $id): string
+    {
+        $db   = Database::getConnection();
+        $stmt = $db->prepare("SELECT nombre FROM usuarios WHERE id = :id");
+        $stmt->execute([':id' => $id]);
+        return (string) $stmt->fetchColumn();
+    }
+
+    public static function getNotificaciones(int $usuarioId): array
+    {
+        $db   = Database::getConnection();
+        $stmt = $db->prepare("
+            SELECT id, pregunta_id, respuesta_id, mensaje, leida, fecha_creacion
+            FROM notificaciones
+            WHERE usuario_id = :uid
+            ORDER BY fecha_creacion DESC, id DESC
+            LIMIT 50
+        ");
+        $stmt->execute([':uid' => $usuarioId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public static function contarNoLeidas(int $usuarioId): int
+    {
+        $db   = Database::getConnection();
+        $stmt = $db->prepare("SELECT COUNT(*) FROM notificaciones WHERE usuario_id = :uid AND leida = 0");
+        $stmt->execute([':uid' => $usuarioId]);
+        return (int) $stmt->fetchColumn();
+    }
+
+    public static function marcarLeidas(int $usuarioId): void
+    {
+        $db   = Database::getConnection();
+        $stmt = $db->prepare("UPDATE notificaciones SET leida = 1 WHERE usuario_id = :uid AND leida = 0");
+        $stmt->execute([':uid' => $usuarioId]);
+    }
 }
