@@ -7,7 +7,7 @@ function cambiarPestana(nombrePestana, botonPulsado) {
     // solo muestra desde el princiopo la de preguntas
     document.getElementById(nombrePestana).style.display = 'block';
 
-    let botones = document.querySelectorAll('.pestana-btn');
+    let botones = document.querySelectorAll('.pestanaBtn');
     botones.forEach(btn => btn.classList.remove('activa'));
     
     botonPulsado.classList.add('activa');

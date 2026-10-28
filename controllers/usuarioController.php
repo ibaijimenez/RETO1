@@ -7,6 +7,8 @@ class UsuarioController extends BaseController {
     public function perfil() {
         $this->comprobarSesion();
 
+        $datosUsuario = AergibideModel::getUsuario((int) $_SESSION['usuario_id']) ?? [];
+
         $mis_preguntas = AergibideModel::getPreguntas($_SESSION['usuario_id'], 'mias');
 
         

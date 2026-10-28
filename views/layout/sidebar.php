@@ -13,7 +13,7 @@ $menu_items = [
     ['id' => 'notificaciones', 'texto' => 'Notificaciones', 'url' => '#',                                              'icono_verde'=>'',                               'icono_blanco'=>'img/aside/notificaciones_blanco.png'],
 ];
 ?>
-
+   
 <aside>
     <div class="menu">
         <?php foreach ($menu_items as $item): ?>
@@ -32,7 +32,7 @@ $menu_items = [
     <div class="usuario-aside">
         <a href="index.php?controller=usuarioController&accion=perfil">
             <img src="img/aside/logo_usuarios.png" alt="Usuario">
-            <span>Carlos Martín</span>
+            <span><?= $_SESSION['nombre'] ?? 'Usuario'; ?></span>
         </a>
     </div>
 </aside>
