@@ -1,33 +1,33 @@
 <?php
     $pagina_activa = 'usuario';
     $img = 'img/main/';
-    $urlDetalle = 'index.php?controller=usuarioController&accion=favoritos';
-    $nombre = $datosUsuario['nombre'] ?? ($_SESSION['nombre'] ?? 'Usuario');
-    $email  = $datosUsuario['email']  ?? '';
-    $puesto       = 'Ingeniera de I+D+i';
-    $departamento = 'Departamento de Análisis Estructural y Materiales';
-    $ubicacion    = 'Vitoria-Gasteiz, Álava';
+    $urlDetalle = 'index.php?controller=PreguntasController&accion=detalle&id=';
 
+    $nombre         = $datosUsuario['nombre'] ?? ($_SESSION['nombre'] ?? 'Usuario');
+    $apellidos      = $datosUsuario['apellidos'] ?? '';
+    $nombreCompleto = trim($nombre . ' ' . $apellidos);
+    $rol   = ($datosUsuario['rol'] ?? '') === 'admin' ? 'Administrador' : 'Usuario';
+    $desde = !empty($datosUsuario['fecha_registro'])
+                ? date('d/m/Y', strtotime($datosUsuario['fecha_registro']))
+                : '—';
     $campos = [
-        'Nombre y Apellidos:' => $nombre,
-        'Puesto:'             => $puesto,
-        'Departamento:'       => $departamento,
-        'Ubicación:'          => $ubicacion,
-        'Email:'              => $email,
+        'Nombre:'        => $nombre,
+        'Apellidos:'     => $apellidos,
+        'Email:'         => $datosUsuario['email'] ?? '',
+        'Rol:'           => $rol,
+        'Miembro desde:' => $desde,
     ];
 
     require __DIR__ . '/layout/head.php';
     require __DIR__ . '/layout/sidebar.php';
 ?>
 <main class="inicio perfil">
-
-    <!-- CABECERA -->
     <section class="cabeceraPerfil">
         <div class="cabeceraFavoritos">
             <div class="iconoFavoritos">
-                <img src="img/aside/logo_usuarios.png" alt="Imagen de <?= htmlspecialchars($nombre); ?>">
+                <img src="img/usuario/iconoPerfil.png" alt="Imagen de <?= htmlspecialchars($nombreCompleto); ?>">
             </div>
-            <h1><?= htmlspecialchars($nombre); ?></h1>
+            <h1><?= htmlspecialchars($nombreCompleto); ?></h1>
         </div>
 
         <div class="datosContador">
@@ -49,8 +49,6 @@
     </section>
 
     <div class="listaPreguntas">
-
-        <!-- PESTAÑA PREGUNTAS -->
         <div id="preguntas" class="seccionPestana">
             <?php if (empty($mis_preguntas)): ?>
                 <p class="sinResultados">Todavía no has publicado ninguna pregunta.</p>
@@ -59,7 +57,7 @@
                 <article class="tarjetaPregunta tarjetaFavorito">
                     <div class="tarjetaCabecera">
                         <h3>
-                            <a href="<?= $urlDetalle . $p['id']; ?>"><?= htmlspecialchars($p['titulo']); ?></a>
+                            <a href="<?= $urlDetalle . (int) $p['id']; ?>"><?= htmlspecialchars($p['titulo']); ?></a>
                         </h3>
                     </div>
 
@@ -73,26 +71,24 @@
 
                     <div class="tarjetaPie">
                         <div class="datoPie">
-                            <img class="iconoCalendario" src="img/aside/preguntas_verde.png" alt="">
-                            <span><?= $p['respuestas']; ?> respuestas</span>
+                            <img class="iconoCalendario" src="img/usuario/respuestas.png" alt="">
+                            <span><?= (int) $p['respuestas']; ?> respuestas</span>
                         </div>
                         <div class="datoPie">
                             <img class="iconoCalendario" src="<?= $img; ?>coraSinRelleno.png" alt="">
-                            <span><?= $p['likes']; ?> likes</span>
+                            <span><?= (int) $p['likes']; ?> likes</span>
                         </div>
                         <div class="datoPie">
                             <img class="iconoCalendario" src="<?= $img; ?>calendario 1.png" alt="">
                             <span><?= date('d/m/Y', strtotime($p['fecha_creacion'])); ?></span>
                         </div>
                         <button type="button" class="btnToggle btnEliminar">
-                            <img src="<?= $img; ?>papelera.png" alt="Eliminar">
+                            <img class="iconoCalendario" src="img/usuario/papelera.png" alt="Eliminar">
                         </button>
                     </div>
                 </article>
             <?php endforeach; ?>
         </div>
-
-        <!-- PESTAÑA GUARDADOS -->
         <div id="guardados" class="seccionPestana" style="display: none;">
             <?php if (empty($preguntas_guardadas)): ?>
                 <p class="sinResultados">Todavía no has guardado ninguna pregunta.</p>
@@ -101,7 +97,7 @@
                 <article class="tarjetaPregunta tarjetaFavorito">
                     <div class="tarjetaCabecera">
                         <h3>
-                            <a href="<?= $urlDetalle . $p['id']; ?>"><?= htmlspecialchars($p['titulo']); ?></a>
+                            <a href="<?= $urlDetalle . (int) $p['id']; ?>"><?= htmlspecialchars($p['titulo']); ?></a>
                         </h3>
                         <button type="button" class="btnToggle btnGuardar">
                             <img src="<?= $img; ?>guardadoConRelleno.png" alt="Guardada">
@@ -123,7 +119,7 @@
                         </div>
                         <div class="datoPie">
                             <img class="iconoCalendario" src="<?= $img; ?>coraSinRelleno.png" alt="">
-                            <span><?= $p['likes']; ?> likes</span>
+                            <span><?= (int) $p['likes']; ?> likes</span>
                         </div>
                         <div class="datoPie">
                             <img class="iconoCalendario" src="<?= $img; ?>calendario 1.png" alt="">
@@ -133,25 +129,60 @@
                 </article>
             <?php endforeach; ?>
         </div>
-
-        <!-- PESTAÑA INFORMACIÓN -->
         <div id="informacion" class="seccionPestana" style="display: none;">
             <div class="formInformacion">
                 <?php foreach ($campos as $titulo => $valor): ?>
                     <div class="campoInfo">
                         <label><?= $titulo; ?></label>
                         <div class="campoValor">
-                            <input type="text" value="<?= htmlspecialchars($valor); ?>">
-                            <button type="button" class="btnToggle btnGuardar">
-                                <img src="<?= $img; ?>iconoGuardar.png" alt="Guardar">
-                            </button>
+                            <input type="text" value="<?= htmlspecialchars($valor); ?>" readonly>
                         </div>
                     </div>
                 <?php endforeach; ?>
             </div>
+            <form class="cajaPassword" method="post"
+                  action="index.php?controller=UsuarioController&accion=cambiarPassword">
+                <h3>Cambiar contraseña</h3>
+
+                <?php if (!empty($mensaje)): ?>
+                    <p class="<?= $mensaje['tipo'] === 'ok' ? 'mensajeOk' : 'mensajeError'; ?>" role="alert">
+                        <?= htmlspecialchars($mensaje['texto']); ?>
+                    </p>
+                <?php endif; ?>
+
+                <label for="actual">Contraseña actual</label>
+                <input type="password" id="actual" name="actual" autocomplete="current-password" required>
+
+                <label for="nueva">Nueva contraseña</label>
+                <input type="password" id="nueva" name="nueva" minlength="6" autocomplete="new-password" required>
+
+                <label for="confirmar">Repetir nueva contraseña</label>
+                <input type="password" id="confirmar" name="confirmar" minlength="6" autocomplete="new-password" required>
+
+                <p id="avisoCoincide" class="mensajeError" style="display:none;">Las contraseñas no coinciden.</p>
+
+                <button type="submit">Cambiar contraseña</button>
+            </form>
         </div>
 
     </div>
 </main>
 
 <script src="JavaScript/pestanas.js"></script>
+<script>
+    (function () {
+        var nueva = document.getElementById('nueva');
+        var conf  = document.getElementById('confirmar');
+        var aviso = document.getElementById('avisoCoincide');
+        function comprobar() {
+            aviso.style.display = (conf.value !== '' && nueva.value !== conf.value) ? 'block' : 'none';
+        }
+        nueva.addEventListener('input', comprobar);
+        conf.addEventListener('input', comprobar);
+    })();
+</script>
+<?php if (!empty($mensaje)): ?>
+<script>
+    cambiarPestana('informacion', document.querySelectorAll('.pestanaBtn')[2]);
+</script>
+<?php endif; ?>

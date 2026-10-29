@@ -1921,4 +1921,56 @@ button.btnNuevaPregunta {
     font-size: 15px;
     font-weight: 600;
 }
-.campoValor .btnGuardar img { width: 20px; height: 20px; }
+.campoValor .btnGuardar img { 
+    width: 20px; 
+    height: 20px; 
+}
+
+/*USUARIOS*/
+.cajaPassword {
+    max-width: 420px;
+    margin-top: 28px;
+    padding: 18px 20px;
+    border: 1px solid #d5dbe2;
+    border-top: 4px solid grey;
+    border-radius: 8px;
+}
+.cajaPassword h3 {
+    margin: 0 0 12px; 
+}
+.cajaPassword label { 
+    display: block;
+    margin: 10px 0 4px;
+    font-size: .9rem; 
+}
+.cajaPassword input {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #c9d0d8;
+    border-radius: 6px;
+    box-sizing: border-box;
+}
+.cajaPassword button {
+    margin-top: 16px;
+    padding: 9px 18px;
+    border: none;
+    border-radius: 6px;
+    background: grey;
+    color: #fff;
+    cursor: pointer;
+}
+
+.mensajeOk, .mensajeError { 
+    padding: 8px 12px; 
+    border-radius: 6px; 
+    margin: 0 0 8px; 
+    font-size: .9rem; 
+}
+.mensajeOk    { 
+    background: #e6f4ea; 
+    color: green; 
+}
+.mensajeError { 
+    background: #fdeaea; 
+    color: red; 
+}

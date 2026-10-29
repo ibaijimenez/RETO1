@@ -12,12 +12,10 @@
 
     <div class="container_registro">
 
-        <!-- IZQUIERDA: imagen (incluye logo y texto) -->
         <div class="fotoRegistro">
             <img src="img/registrar/foto_registrar.png" alt="Únete al equipo de Aergibide">
         </div>
 
-        <!-- DERECHA: formulario -->
         <div class="registrarse">
 
             <div class="formularioLogin">
@@ -31,10 +29,9 @@
                     plataforma.
                 </p>
 
-                <!-- para ostrar error en caso de detercat un error -->
                 <?php if (!empty($error)): ?>
                     <p style="color: red; font-weight: bold; text-align: center; background-color: #ffe6e6; padding: 10px; border-radius: 5px;">
-                        <?= $error; ?>
+                        <?= htmlspecialchars($error); ?>
                     </p>
                 <?php endif; ?>
 
@@ -75,18 +72,6 @@
                                placeholder="Repite la contraseña" required>
                     </div>
 
-                    <label for="departamento">Departamento</label>
-                    <div class="campoLogin">
-                        <img src="img/registrar/departamento.png" alt="">
-                        <select id="departamento" name="departamento" required>
-                            <option value="" disabled selected>Selecciona un departamento</option>
-                            <option value="ingenieria">Ingeniería</option>
-                            <option value="calidad">Calidad</option>
-                            <option value="produccion">Producción</option>
-                            <option value="administracion">Administración</option>
-                        </select>
-                    </div>
-
                     <label class="aceptoTerminos">
                         <input type="checkbox" name="terminos" required>
                         <span>
@@ -104,7 +89,7 @@
 
                 <p class="registroLogin">
                     ¿Ya tienes cuenta?
-                    <a href="index.php?pagina=login" class="regigit branchstrar">Inicia sesión</a>
+                    <a href="index.php?pagina=login" class="registrar">Inicia sesión</a>
                 </p>
 
             </div>

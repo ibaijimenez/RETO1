@@ -1,56 +1,56 @@
-    <?php
-    require_once __DIR__ . '/BaseController.php';
-    require_once __DIR__ . '/../models/AergibideModel.php'; 
+<?php
+require_once __DIR__ . '/BaseController.php';
+require_once __DIR__ . '/../models/AergibideModel.php';
 
 class registroController extends BaseController {
 
-        public function index() {
-            require_once __DIR__ . '/../views/registrar.php';
+    public function index() {
+        require_once __DIR__ . '/../views/registrar.php';
+    }
+
+    public function registrar() {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: index.php?controller=registroController&accion=index');
+            exit;
         }
 
-        public function registrar() {
-            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $nombre     = trim($_POST['nombre'] ?? '');
+        $apellidos  = trim($_POST['apellidos'] ?? '');
+        $correo     = trim($_POST['correo'] ?? '');
+        $contrasena = trim($_POST['contrasena'] ?? '');
+        $confirmar  = trim($_POST['confirmar'] ?? '');
 
-                $nombre       = trim($_POST['nombre'] ?? '');
-                $apellidos    = trim($_POST['apellidos'] ?? '');
-                $correo       = trim($_POST['correo'] ?? '');
-                $contrasena   = trim($_POST['contrasena'] ?? '');
-                $confirmar    = trim($_POST['confirmar'] ?? '');
-                $departamento = $_POST['departamento'] ?? '';
+        if ($contrasena !== $confirmar) {
+            $error = "Las contraseñas no coinciden";
+            require __DIR__ . '/../views/registrar.php';
+            exit;
+        }
 
-                if ($contrasena !== $confirmar) {//comprobar contraeñas iguales
-                    $error = "Las contraseñas no coinciden";
-                    require __DIR__ . '/../views/registrar.php';
-                    exit;
-                }
+        if (!preg_match("/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/", $nombre) || !preg_match("/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/", $apellidos)) {
+            $error = "El nombre o los apellidos contienen caracteres no válidos";
+            require __DIR__ . '/../views/registrar.php';
+            exit;
+        }
 
-                //para nombre y apellido
-                if (!preg_match("/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/", $nombre) || !preg_match("/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/", $apellidos)) {
-                    $error = "El nombre o los apellidos contienen caracteres no válidos";
-                    require __DIR__ . '/../views/registrar.php';
-                    exit;
-                }
+        $datos = [
+            'nombre'     => $nombre,
+            'apellidos'  => $apellidos,
+            'correo'     => $correo,
+            'contrasena' => $contrasena
+        ];
 
-                $datos = [
-                    'nombre'       => $nombre,
-                    'apellidos'    => $apellidos,
-                    'correo'       => $correo,
-                    'contraseña'   => $contrasena,
-                    'departamento' => $departamento
-                ];
-
-                //guardar bd
-                $exito = AergibideModel::create($datos);
-
-                if ($exito) {
-                    header('Location: index.php?controller=loginController&action=index');
-                    exit;
-                } else {
-                    $error = "No se pudo registrar el usuario en la base de datos";
-                    require __DIR__ . '/../views/registrar.php';
-                    exit;
-                }
+        try {
+            AergibideModel::create($datos);
+            header('Location: index.php?controller=loginController&accion=index');
+            exit;
+        } catch (PDOException $e) {
+            if ($e->getCode() == 23000) {
+                $error = "Ese correo ya está registrado";
+            } else {
+                $error = "Error: " . $e->getMessage();
             }
+            require __DIR__ . '/../views/registrar.php';
+            exit;
         }
+    }
 }
-

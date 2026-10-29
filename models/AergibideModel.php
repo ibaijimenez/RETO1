@@ -11,9 +11,22 @@ class AergibideModel {
 
     }
 
-    public static function create($datos) {
+public static function create($datos) {
+    $db = Database::getConnection();
+    $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    }
+    $stmt = $db->prepare("
+        INSERT INTO usuarios (nombre, apellidos, email, passwd, rol)
+        VALUES (:nombre, :apellidos, :correo, :contrasena, 'user')
+    ");
+    $stmt->execute([
+        ':nombre'     => $datos['nombre'],
+        ':apellidos'  => $datos['apellidos'],
+        ':correo'     => $datos['correo'],
+        ':contrasena' => $datos['contrasena'],
+    ]);
+    return true;
+}
 
     public static function deleteById($id) {
 
@@ -461,14 +474,14 @@ class AergibideModel {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public static function getUsuario(int $id): ?array
-    {
-        $db   = Database::getConnection();
-        $stmt = $db->prepare("SELECT id, nombre, email, rol FROM usuarios WHERE id = :id");
-        $stmt->execute([':id' => $id]);
-        $fila = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $fila ?: null;
-    }
+public static function getUsuario(int $id): ?array
+{
+    $db   = Database::getConnection();
+    $stmt = $db->prepare("SELECT id, nombre, apellidos, email, rol, fecha_registro FROM usuarios WHERE id = :id");
+    $stmt->execute([':id' => $id]);
+    $fila = $stmt->fetch(PDO::FETCH_ASSOC);
+    return $fila ?: null;
+}
 
     public static function crearUsuario(string $nombre, string $email, string $passwd, string $rol): bool
     {
@@ -618,4 +631,20 @@ public static function eliminarRespuesta(int $id): ?int
         $stmt = $db->prepare("UPDATE notificaciones SET leida = 1 WHERE usuario_id = :uid AND leida = 0");
         $stmt->execute([':uid' => $usuarioId]);
     }
+    // ==================================================================
+    // Usuarios
+    // ==================================================================
+public static function cambiarPassword(int $id, string $actual, string $nueva): bool
+{
+    $db   = Database::getConnection();
+    $stmt = $db->prepare("SELECT passwd FROM usuarios WHERE id = :id");
+    $stmt->execute([':id' => $id]);
+    $guardada = $stmt->fetchColumn();
+    if ($guardada === false || !hash_equals((string) $guardada, $actual)) {
+        return false;
+    }
+    $stmt = $db->prepare("UPDATE usuarios SET passwd = :nueva WHERE id = :id");
+    return $stmt->execute([':nueva' => $nueva, ':id' => $id]);
+}
+
 }
