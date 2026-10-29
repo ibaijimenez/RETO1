@@ -1,13 +1,17 @@
 <?php
 $rf = 'index.php?controller=';
 
+// Ubicación del mapa (puede ser una dirección o unas coordenadas)
+$ubicacion    = 'C. Portal de Arriaga, 64, 01013 Vitoria-Gasteiz, Álava';
+$ubicacionUrl = urlencode($ubicacion);   // convierte espacios y tildes para que valgan en un enlace
+
 // Enlaces del pie. Si cambia alguna ruta, se toca aquí y listo.
 $enlacesFooter = [
     'Inicio'         => $rf . 'AergibideController&accion=inicio',
     'Preguntas'      => $rf . 'PreguntasController&accion=preguntas',
     'Documentos'     => $rf . 'DocumentosController&accion=documentos',
     'Favoritos'      => $rf . 'FavoritosController&accion=favoritos',
-    'Notificaciones' => '#',   // pon aquí la misma URL que en sidebar.php
+    'Notificaciones' => $rf . 'NotificacionesController&accion=notificaciones'
 ];
 ?>
 <footer class="footerWeb">
@@ -55,11 +59,11 @@ $enlacesFooter = [
             <h4>Encuéntranos</h4>
             <iframe
                 title="Ubicación de Aergibide SL en Vitoria-Gasteiz"
-                src="https://maps.google.com/maps?q=42.866920,-2.659565&amp;z=15&amp;output=embed"
+                src="https://maps.google.com/maps?q=<?= $ubicacionUrl; ?>&amp;z=16&amp;output=embed"
                 loading="lazy"
                 referrerpolicy="no-referrer-when-downgrade"></iframe>
             <a class="verMapa" target="_blank" rel="noopener"
-               href="https://www.google.com/maps?q=42.866920,-2.659565">
+               href="https://www.google.com/maps?q=<?= $ubicacionUrl; ?>">
                 Abrir en Google Maps &rsaquo;
             </a>
         </div>
@@ -71,4 +75,4 @@ $enlacesFooter = [
         <span>Hecho con cariño por el equipo Vertex</span>
     </div>
 
-</footer>   
+</footer>

@@ -22,7 +22,6 @@
         </div>
 
         <div class="acciones">
-            <img src="img/header/campana_notificaciones.png" alt="Notificaciones">
           
             <?php if (($_SESSION['rol'] ?? '') === 'admin'): ?>
                 <a href="index.php?controller=AdminController&accion=usuarios" title="Administración">

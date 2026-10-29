@@ -1,16 +1,13 @@
 <?php
     $pagina_activa = 'usuario';
     $img = 'img/main/';
-
-    // apartado informacion usuario
+    $urlDetalle = 'index.php?controller=usuarioController&accion=favoritos';
     $nombre = $datosUsuario['nombre'] ?? ($_SESSION['nombre'] ?? 'Usuario');
     $email  = $datosUsuario['email']  ?? '';
-    
-    // La BD todavía no guarda puesto / departamento / ubicación: valores de ejemplo
     $puesto       = 'Ingeniera de I+D+i';
     $departamento = 'Departamento de Análisis Estructural y Materiales';
     $ubicacion    = 'Vitoria-Gasteiz, Álava';
-    
+
     $campos = [
         'Nombre y Apellidos:' => $nombre,
         'Puesto:'             => $puesto,
@@ -18,8 +15,7 @@
         'Ubicación:'          => $ubicacion,
         'Email:'              => $email,
     ];
-  
-    
+
     require __DIR__ . '/layout/head.php';
     require __DIR__ . '/layout/sidebar.php';
 ?>
@@ -29,9 +25,9 @@
     <section class="cabeceraPerfil">
         <div class="cabeceraFavoritos">
             <div class="iconoFavoritos">
-                <img src="img/aside/logo_usuarios.png" alt="Imagen de <?= $nombre; ?>">
+                <img src="img/aside/logo_usuarios.png" alt="Imagen de <?= htmlspecialchars($nombre); ?>">
             </div>
-            <h1><?= $nombre; ?></h1>
+            <h1><?= htmlspecialchars($nombre); ?></h1>
         </div>
 
         <div class="datosContador">
@@ -41,7 +37,7 @@
             </div>
             <div class="dato">
                 <span class="numero"><?= count($preguntas_guardadas); ?></span>
-                <span class="label">Favoritos</span>
+                <span class="label">Guardados</span>
             </div>
         </div>
 
@@ -60,15 +56,17 @@
                 <p class="sinResultados">Todavía no has publicado ninguna pregunta.</p>
             <?php endif; ?>
             <?php foreach ($mis_preguntas as $p): ?>
-                <article class="tarjetaPregunta">
+                <article class="tarjetaPregunta tarjetaFavorito">
                     <div class="tarjetaCabecera">
-                        <h3><?= $p['titulo']; ?></h3>
+                        <h3>
+                            <a href="<?= $urlDetalle . $p['id']; ?>"><?= htmlspecialchars($p['titulo']); ?></a>
+                        </h3>
                     </div>
 
                     <div class="etiquetas">
                         <?php if (!empty($p['temas'])): ?>
                             <?php foreach (explode('||', $p['temas']) as $tema): ?>
-                                <span class="etiqueta"><?= $tema; ?></span>
+                                <span class="etiqueta"><?= htmlspecialchars($tema); ?></span>
                             <?php endforeach; ?>
                         <?php endif; ?>
                     </div>
@@ -102,24 +100,26 @@
             <?php foreach ($preguntas_guardadas as $p): ?>
                 <article class="tarjetaPregunta tarjetaFavorito">
                     <div class="tarjetaCabecera">
-                        <h3><?= $p['titulo']; ?></h3>
+                        <h3>
+                            <a href="<?= $urlDetalle . $p['id']; ?>"><?= htmlspecialchars($p['titulo']); ?></a>
+                        </h3>
                         <button type="button" class="btnToggle btnGuardar">
                             <img src="<?= $img; ?>guardadoConRelleno.png" alt="Guardada">
                         </button>
                     </div>
 
                     <div class="etiquetas">
-    <?php if (!empty($p['temas'])): ?>
-        <?php foreach (explode('||', $p['temas']) as $tema): ?>
-            <span class="etiqueta"><?= $tema; ?></span>
-        <?php endforeach; ?>
-    <?php endif; ?>
-</div>
+                        <?php if (!empty($p['temas'])): ?>
+                            <?php foreach (explode('||', $p['temas']) as $tema): ?>
+                                <span class="etiqueta"><?= htmlspecialchars($tema); ?></span>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </div>
 
                     <div class="tarjetaPie">
                         <div class="datoPie">
                             <img class="avatarMini" src="<?= $img; ?>iconoPerfil.png" alt="">
-                            <span><?= $p['autor']; ?></span>
+                            <span><?= htmlspecialchars($p['autor']); ?></span>
                         </div>
                         <div class="datoPie">
                             <img class="iconoCalendario" src="<?= $img; ?>coraSinRelleno.png" alt="">
@@ -127,7 +127,7 @@
                         </div>
                         <div class="datoPie">
                             <img class="iconoCalendario" src="<?= $img; ?>calendario 1.png" alt="">
-                            <span><?= $p['fecha']; ?></span>
+                            <span><?= date('d/m/Y', strtotime($p['fecha_creacion'])); ?></span>
                         </div>
                     </div>
                 </article>
@@ -141,7 +141,7 @@
                     <div class="campoInfo">
                         <label><?= $titulo; ?></label>
                         <div class="campoValor">
-                            <input type="text" value="<?= $valor; ?>">
+                            <input type="text" value="<?= htmlspecialchars($valor); ?>">
                             <button type="button" class="btnToggle btnGuardar">
                                 <img src="<?= $img; ?>iconoGuardar.png" alt="Guardar">
                             </button>
