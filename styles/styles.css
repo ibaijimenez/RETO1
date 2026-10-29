@@ -1922,3 +1922,248 @@ button.btnNuevaPregunta {
     font-weight: 600;
 }
 .campoValor .btnGuardar img { width: 20px; height: 20px; }
+
+
+/* ==========================================================================
+   FILTRO POR TEMAS  (versión con el mismo estilo que las etiquetas)
+   Si ya pegaste el bloque anterior en styles.css, BÓRRALO y pega este entero.
+   ========================================================================== */
+.filtros {
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.filtrosDerecha {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.filtroTemas {
+    position: relative;
+}
+
+/* Botón "Temas": igual que una etiqueta de pregunta */
+.filtroTemas summary {
+    list-style: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background-color: #E4EAF6;
+    color: #111820;
+    font-family: var(--fuente-titulo);
+    font-weight: 700;
+    font-size: 20px;
+    padding: 8px 26px;
+    border-radius: 20px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.25);
+    transition: background-color 0.15s, color 0.15s;
+}
+
+.filtroTemas summary::-webkit-details-marker { display: none; }
+
+.filtroTemas summary:hover {
+    background-color: #D5DEF0;
+}
+
+/* Flechita */
+.filtroTemas summary::after {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-right: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    transform: rotate(45deg) translateY(-2px);
+}
+
+.filtroTemas[open] summary::after {
+    transform: rotate(-135deg);
+}
+
+/* Con temas marcados, el botón se pinta de verde */
+.filtroTemas.conFiltro summary {
+    background-color: #00B386;
+    color: white;
+}
+
+/* Panel desplegable */
+.panelTemas {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 10px);
+    z-index: 20;
+    width: 360px;
+    max-width: 90vw;
+    box-sizing: border-box;
+    background-color: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    padding: 18px 20px 16px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+/* Cada tema es una etiqueta que se pulsa (la casilla real queda oculta) */
+.opcionTema {
+    cursor: pointer;
+}
+
+.opcionTema input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.opcionTema span {
+    display: inline-block;
+    background-color: #E4EAF6;
+    color: #111820;
+    font-family: var(--fuente-titulo);
+    font-weight: 700;
+    font-size: 16px;
+    padding: 7px 18px;
+    border-radius: 20px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.25);
+    transition: background-color 0.15s, color 0.15s, transform 0.15s;
+}
+
+.opcionTema:hover span {
+    transform: translateY(-1px);
+}
+
+.opcionTema input:checked + span {
+    background-color: #00B386;
+    color: white;
+}
+
+.opcionTema input:focus-visible + span {
+    outline: 2px solid #00A67E;
+    outline-offset: 2px;
+}
+
+/* Limpiar / Aplicar */
+.accionesTemas {
+    flex-basis: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 6px;
+    padding-top: 14px;
+    border-top: 1px solid #E5E7EB;
+}
+
+.accionesTemas a {
+    color: #6B7280;
+    font-size: 17px;
+    text-decoration: none;
+}
+
+.accionesTemas a:hover {
+    text-decoration: underline;
+}
+
+.accionesTemas button {
+    background-color: #00B386;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 24px;
+    font-family: var(--fuente-titulo);
+    font-weight: 700;
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.25);
+}
+
+.accionesTemas button:hover {
+    background-color: #009D76;
+}
+
+@media (max-width: 900px) {
+    .filtrosDerecha { flex-wrap: wrap; }
+    .panelTemas { right: auto; left: 0; }
+}
+
+/* ==========================================================================
+   ARCHIVOS ADJUNTOS  (pegar al final de styles.css)
+   ========================================================================== */
+.zonaAdjuntos {
+    position: relative;
+    text-align: center;
+    background-color: #F0FAF8;
+    border: 2px dashed #00B386;
+    border-radius: 14px;
+    padding: 34px 16px;
+    margin-bottom: 28px;
+    box-sizing: border-box;
+    width: 100%;
+    transition: background-color 0.15s;
+}
+.zonaAdjuntos.arrastrando { background-color: #DDF4EC; }
+
+/* El input ocupa toda la caja pero es invisible */
+.zonaAdjuntos input[type="file"] {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.zonaTitulo { font-size: 22px; font-weight: 700; color: #111820; margin-top: 8px; }
+.enlaceSel  { color: #00B386; text-decoration: underline; }
+.zonaAyuda  { font-size: 18px; color: #777E86; margin-top: 4px; }
+
+.listaElegidos {
+    list-style: none;
+    padding: 0;
+    margin-top: 12px;
+    font-weight: 600;
+    color: #00A67E;
+}
+
+.zonaCompacta { padding: 16px; margin-bottom: 0; }
+.zonaCompacta .zonaTitulo { font-size: 18px; margin-top: 0; }
+.zonaCompacta .zonaAyuda  { font-size: 15px; }
+
+/* Archivos mostrados en el detalle */
+.listaAdjuntos {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+}
+.adjunto {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: flex-start;
+}
+.adjuntoMiniatura {
+    display: block;
+    max-width: 220px;
+    max-height: 160px;
+    border-radius: 10px;
+    border: 1px solid #BFC3C7;
+    object-fit: cover;
+}
+.adjuntoEnlace {
+    display: inline-block;
+    padding: 6px 14px;
+    background-color: #E8F7F4;
+    color: #00A67E;
+    border-radius: 20px;
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: none;
+}
+.adjuntoEnlace:hover { background-color: #D3F0EA; }
+.adjuntoTam { color: #6B7280; font-weight: 400; }
+
+.respuestaAdjuntos { margin: 12px 0 0 64px; }
+@media (max-width: 900px) { .respuestaAdjuntos { margin-left: 0; } }

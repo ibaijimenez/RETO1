@@ -28,10 +28,10 @@ require __DIR__ . '/layout/sidebar.php';
 
     <h1>Editar pregunta</h1>
     <p class="subtituloPreguntas">
-        Cambia el título, la descripción o las etiquetas de tu pregunta.
+        Cambia el título, la descripción, las etiquetas o los archivos de tu pregunta.
     </p>
 
-    <form class="formPregunta" method="POST"
+    <form class="formPregunta" method="POST" enctype="multipart/form-data"
           action="index.php?controller=PreguntasController&accion=actualizarPregunta">
 
         <?php if (!empty($errores)): ?>
@@ -67,6 +67,37 @@ require __DIR__ . '/layout/sidebar.php';
         </div>
         <p class="ayudaForm">Puedes elegir hasta 3 etiquetas.</p>
 
+        <?php if (!empty($adjuntosPregunta)): ?>
+            <label>Archivos actuales</label>
+            <ul class="listaAdjuntos" style="margin-bottom: 28px;">
+                <?php foreach ($adjuntosPregunta as $a): ?>
+                    <li class="adjunto">
+                        <a class="adjuntoEnlace" href="<?= htmlspecialchars($a['url']); ?>" target="_blank">
+                            <?= htmlspecialchars($a['nombre_original']); ?>
+                        </a>
+                        <label style="font-size: 16px; font-weight: 400; margin: 0; cursor: pointer;">
+                            <input type="checkbox" name="borrar[]" value="<?= htmlspecialchars($a['archivo']); ?>"> Quitar
+                        </label>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+        <?php endif; ?>
+
+        <label>Añadir archivos</label>
+        <div class="zonaAdjuntos">
+            <input type="file" id="archivos" name="archivos[]" multiple
+                   accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg,.txt">
+            <svg viewBox="0 0 64 64" width="64" height="64" aria-hidden="true">
+                <path d="M20 44a11 11 0 0 1-1-21.9A14 14 0 0 1 46 24a10 10 0 0 1-1 20"
+                      fill="none" stroke="#3CCBA0" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M32 54V30M24 38l8-8 8 8" fill="none" stroke="#3CCBA0"
+                      stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <p class="zonaTitulo">Arrastra archivos aquí o <span class="enlaceSel">selecciónalos</span></p>
+            <p class="zonaAyuda">PDF, imágenes, documentos, excels...</p>
+            <ul class="listaElegidos"></ul>
+        </div>
+
         <div class="pieForm">
             <p class="avisoForm">Los campos marcados con <span class="obligatorio">*</span> son obligatorios.</p>
 
@@ -80,5 +111,6 @@ require __DIR__ . '/layout/sidebar.php';
 
 </main>
 
+<script src="JavaScript/adjuntos.js"></script>
 </body>
 </html>
