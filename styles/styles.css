@@ -1127,6 +1127,51 @@ main.nuevaPregunta h1 {
 }
 
 /* ==========================================================================
+   EDITAR PREGUNTA  (pegar al final de styles.css)
+   ========================================================================== */
+
+/* Título del detalle con el botón Editar a la derecha */
+.cabeceraDetalle {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+}
+
+.btnEditar {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+    border: 1px solid #00B386;
+    border-radius: 12px;
+    padding: 8px 20px;
+    font-size: 18px;
+    font-weight: 600;
+    color: #00B386;
+    text-decoration: none;
+    background-color: white;
+}
+
+.btnEditar:hover {
+    background-color: #E8F7F4;
+}
+
+/* Etiquetas del detalle: un poco más pequeñas que en las tarjetas */
+.etiquetasDetalle {
+    margin: 0 0 22px;
+}
+
+.etiquetasDetalle .etiqueta {
+    font-size: 16px;
+    padding: 6px 20px;
+}
+
+@media (max-width: 600px) {
+    .cabeceraDetalle { flex-direction: column; }
+}
+
+/* ==========================================================================
    DESPLEGABLES DE ETIQUETAS
    ========================================================================== */
 .filaTemas {

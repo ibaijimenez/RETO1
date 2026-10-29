@@ -2,9 +2,11 @@
 $pagina_activa = 'preguntas';
 
 // Valores por si el formulario de respuesta vuelve con errores
-$errores    = $errores    ?? [];
-$contenido  = $contenido  ?? '';
-$respuestas = $respuestas ?? [];
+$errores       = $errores       ?? [];
+$contenido     = $contenido     ?? '';
+$respuestas    = $respuestas    ?? [];
+$temasPregunta = $temasPregunta ?? [];
+$esMia         = $esMia         ?? false;
 
 $rutaPreguntas = 'index.php?controller=PreguntasController&accion=preguntas';
 
@@ -43,7 +45,30 @@ require __DIR__ . '/layout/sidebar.php';
         <span>Detalle pregunta</span>
     </nav>
 
-    <h1><?= htmlspecialchars($pregunta['titulo']); ?></h1>
+    <!-- Título y botón de editar (solo si la pregunta es tuya) -->
+    <div class="cabeceraDetalle">
+        <h1><?= htmlspecialchars($pregunta['titulo']); ?></h1>
+
+        <?php if ($esMia): ?>
+            <a class="btnEditar"
+               href="index.php?controller=PreguntasController&accion=editarPregunta&id=<?= (int) $pregunta['id']; ?>">
+                <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                    <path d="M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4" fill="none" stroke="currentColor"
+                          stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Editar pregunta
+            </a>
+        <?php endif; ?>
+    </div>
+
+    <!-- Temas de la pregunta -->
+    <?php if (!empty($temasPregunta)): ?>
+        <div class="etiquetas etiquetasDetalle">
+            <?php foreach ($temasPregunta as $tema): ?>
+                <span class="etiqueta"><?= htmlspecialchars($tema['nombre']); ?></span>
+            <?php endforeach; ?>
+        </div>
+    <?php endif; ?>
 
     <!-- Autor, likes, fecha y guardar -->
     <div class="metaDetalle">

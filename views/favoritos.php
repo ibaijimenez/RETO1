@@ -4,9 +4,6 @@ $img    = 'img/main/';
 $imgDet = 'img/preguntas/';
 $base   = 'index.php?controller=FavoritosController&accion=favoritos';
 
-// Vienen del controlador: $preguntas, $respuestas, $total,
-// $totalPreguntas, $totalRespuestas, $filtro, $orden
-
 $corazon = '<img class="iconoOff" src="' . $imgDet . 'coraSinRelleno.png" alt="">'
          . '<img class="iconoOn"  src="' . $imgDet . 'coraConRelleno.png" alt="">';
 

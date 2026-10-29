@@ -4,7 +4,7 @@ require_once __DIR__ . '/../models/AergibideModel.php';
 
 class PreguntasController extends BaseController {
 
-    // Lista de preguntas (antes estaba en AergibideController)
+    // Lista de preguntas con buscador, orden y filtro por temas
     public function preguntas() {
         $this->comprobarSesion();
 
@@ -12,7 +12,13 @@ class PreguntasController extends BaseController {
         $busqueda = trim($_GET['q'] ?? '');
         $orden    = $_GET['orden'] ?? 'recientes';
 
-        $preguntas = AergibideModel::getPreguntas((int) $_SESSION['usuario_id'], $filtro, $busqueda, $orden);
+        // Temas marcados: solo números, sin repetir ni ceros
+        $temasSel = array_values(array_unique(array_filter(array_map('intval', (array) ($_GET['temas'] ?? [])))));
+
+        // Todos los temas, para pintar las casillas
+        $temasDisponibles = AergibideModel::getTemas();
+
+        $preguntas = AergibideModel::getPreguntas((int) $_SESSION['usuario_id'], $filtro, $busqueda, $orden, $temasSel);
 
         require __DIR__ . '/../views/preguntas.php';
     }
@@ -42,29 +48,10 @@ class PreguntasController extends BaseController {
 
         $temasDisponibles = AergibideModel::getTemas();
 
-        // 1. Validar
-        $errores = [];
-        if ($titulo === '') {
-            $errores[] = 'El título es obligatorio.';
-        } elseif (mb_strlen($titulo) > 200) {
-            $errores[] = 'El título no puede tener más de 200 caracteres.';
-        }
-        if ($descripcion === '') {
-            $errores[] = 'La descripción es obligatoria.';
-        }
+        // Validar y quedarnos solo con los temas que existen
+        [$errores, $seleccionados] = $this->validarPregunta($titulo, $descripcion, $elegidos, $temasDisponibles);
 
-        // 2. De lo elegido, quedarnos solo con temas que existen y sin repetir
-        $idsExistentes = array_column($temasDisponibles, 'id');
-        $seleccionados = [];
-        foreach ($elegidos as $id) {
-            $id = (int) $id;
-            if (in_array($id, $idsExistentes) && !in_array($id, $seleccionados)) {
-                $seleccionados[] = $id;
-            }
-        }
-        $seleccionados = array_slice($seleccionados, 0, 3);
-
-        // 3. Guardar (si no hay errores)
+        // Guardar (si no hay errores)
         if (empty($errores)) {
             try {
                 AergibideModel::crearPregunta((int) $_SESSION['usuario_id'], $titulo, $descripcion, $seleccionados);
@@ -79,26 +66,72 @@ class PreguntasController extends BaseController {
             }
         }
 
-        // 4. Si hay errores, volver a mostrar el formulario con lo que ya había escrito
+        // Si hay errores, volver a mostrar el formulario con lo que ya había escrito
         require __DIR__ . '/../views/nuevaPregunta.php';
     }
 
-    // Detalle de una pregunta con sus respuestas
+    // Detalle de una pregunta con sus temas y sus respuestas
     public function detalle() {
         $this->comprobarSesion();
 
-        $id       = (int) ($_GET['id'] ?? 0);
-        $pregunta = AergibideModel::getPregunta($id, (int) $_SESSION['usuario_id']);
+        $this->mostrarDetalle((int) ($_GET['id'] ?? 0));
+    }
 
-        // Si no existe, volvemos a la lista
-        if ($pregunta === null) {
+    // Muestra el formulario para editar una pregunta (solo si es tuya)
+    public function editarPregunta() {
+        $this->comprobarSesion();
+
+        $id       = (int) ($_GET['id'] ?? 0);
+        $pregunta = $this->cargarPreguntaPropia($id);
+
+        // Valores actuales de la pregunta
+        $titulo           = $pregunta['titulo'];
+        $descripcion      = $pregunta['descripcion'];
+        $seleccionados    = array_map(function ($t) { return (int) $t['id']; }, AergibideModel::getTemasDePregunta($id));
+        $temasDisponibles = AergibideModel::getTemas();
+        $errores          = [];
+
+        require __DIR__ . '/../views/editarPregunta.php';
+    }
+
+    // Recibe el formulario de edición, valida, guarda y vuelve al detalle
+    public function actualizarPregunta() {
+        $this->comprobarSesion();
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             header('Location: index.php?controller=PreguntasController&accion=preguntas');
             exit;
         }
 
-        $respuestas = AergibideModel::getRespuestas($id, (int) $_SESSION['usuario_id']);
+        $id       = (int) ($_POST['pregunta_id'] ?? 0);
+        $pregunta = $this->cargarPreguntaPropia($id);   // si no es tuya, te saca de aquí
 
-        require __DIR__ . '/../views/detallePregunta.php';
+        $titulo      = trim($_POST['titulo'] ?? '');
+        $descripcion = trim($_POST['descripcion'] ?? '');
+        $elegidos    = $_POST['temas'] ?? [];
+
+        $temasDisponibles = AergibideModel::getTemas();
+
+        [$errores, $seleccionados] = $this->validarPregunta($titulo, $descripcion, $elegidos, $temasDisponibles);
+
+        if (empty($errores)) {
+            try {
+                $guardada = AergibideModel::actualizarPregunta($id, (int) $_SESSION['usuario_id'], $titulo, $descripcion, $seleccionados);
+
+                if ($guardada) {
+                    header('Location: index.php?controller=PreguntasController&accion=detalle&id=' . $id);
+                    exit;
+                }
+                $errores[] = 'No puedes editar esta pregunta.';
+            } catch (Throwable $e) {
+                $errores[] = 'No se ha podido guardar los cambios. Inténtalo de nuevo.';
+                // Para depurar, quita las // de la línea de abajo:
+                // $errores[] = $e->getMessage();
+            }
+        }
+
+        // Con errores: volver al formulario conservando lo escrito
+        require __DIR__ . '/../views/editarPregunta.php';
     }
 
     // Recibe el formulario de respuesta, valida, guarda y vuelve al detalle
@@ -137,8 +170,7 @@ class PreguntasController extends BaseController {
         }
 
         // Con errores: volver a mostrar el detalle conservando lo escrito
-        $respuestas = AergibideModel::getRespuestas($id, (int) $_SESSION['usuario_id']);
-        require __DIR__ . '/../views/detallePregunta.php';
+        $this->mostrarDetalle($id, $errores, $contenido);
     }
 
     // Like / guardado / respuesta favorita. Lo llama JavaScript (fetch) y responde en JSON.
@@ -171,5 +203,72 @@ class PreguntasController extends BaseController {
             // Para depurar: echo json_encode(['error' => $e->getMessage()]);
         }
         exit;
+    }
+
+    // ==================================================================
+    // Funciones de apoyo (no son páginas, solo las usan las de arriba)
+    // ==================================================================
+
+    // Prepara todo lo que necesita la página de detalle y la muestra
+    private function mostrarDetalle(int $id, array $errores = [], string $contenido = '') {
+        $usuarioId = (int) $_SESSION['usuario_id'];
+
+        $pregunta = AergibideModel::getPregunta($id, $usuarioId);
+
+        // Si no existe, volvemos a la lista
+        if ($pregunta === null) {
+            header('Location: index.php?controller=PreguntasController&accion=preguntas');
+            exit;
+        }
+
+        $respuestas    = AergibideModel::getRespuestas($id, $usuarioId);
+        $temasPregunta = AergibideModel::getTemasDePregunta($id);
+        $esMia         = ((int) $pregunta['usuario_id'] === $usuarioId);
+
+        require __DIR__ . '/../views/detallePregunta.php';
+    }
+
+    // Devuelve la pregunta si es del usuario. Si no existe o es de otro, redirige y corta.
+    private function cargarPreguntaPropia(int $id): array {
+        $usuarioId = (int) $_SESSION['usuario_id'];
+        $pregunta  = AergibideModel::getPregunta($id, $usuarioId);
+
+        if ($pregunta === null) {
+            header('Location: index.php?controller=PreguntasController&accion=preguntas');
+            exit;
+        }
+        if ((int) $pregunta['usuario_id'] !== $usuarioId) {
+            header('Location: index.php?controller=PreguntasController&accion=detalle&id=' . $id);
+            exit;
+        }
+        return $pregunta;
+    }
+
+    // Valida título y descripción y filtra los temas elegidos.
+    // Devuelve [lista de errores, lista de ids de temas válidos (máximo 3)]
+    private function validarPregunta(string $titulo, string $descripcion, array $elegidos, array $temasDisponibles): array {
+        $errores = [];
+
+        if ($titulo === '') {
+            $errores[] = 'El título es obligatorio.';
+        } elseif (mb_strlen($titulo) > 200) {
+            $errores[] = 'El título no puede tener más de 200 caracteres.';
+        }
+        if ($descripcion === '') {
+            $errores[] = 'La descripción es obligatoria.';
+        }
+
+        // Solo temas que existen y sin repetir
+        $idsExistentes = array_column($temasDisponibles, 'id');
+        $seleccionados = [];
+        foreach ($elegidos as $id) {
+            $id = (int) $id;
+            if (in_array($id, $idsExistentes) && !in_array($id, $seleccionados)) {
+                $seleccionados[] = $id;
+            }
+        }
+        $seleccionados = array_slice($seleccionados, 0, 3);
+
+        return [$errores, $seleccionados];
     }
 }

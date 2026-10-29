@@ -163,10 +163,10 @@ class AergibideModel {
     }
 
     // Devuelve una pregunta con autor, likes y si el usuario la ha likeado/guardado. null si no existe.
-    public static function getPregunta(int $id, int $usuarioId): ?array
+  public static function getPregunta(int $id, int $usuarioId): ?array
     {
         $sql = "
-            SELECT p.id, p.titulo, p.descripcion, p.fecha_creacion,
+            SELECT p.id, p.usuario_id, p.titulo, p.descripcion, p.fecha_creacion,
                 u.nombre AS autor,
                 (SELECT COUNT(*) FROM respuestas r WHERE r.pregunta_id = p.id) AS respuestas,
                 (SELECT COUNT(*) FROM pregunta_likes l WHERE l.pregunta_id = p.id) AS likes,
@@ -184,6 +184,64 @@ class AergibideModel {
         $fila = $stmt->fetch(PDO::FETCH_ASSOC);
         return $fila ?: null;
     }
+    
+    // Temas de una pregunta: [['id' => 1, 'nombre' => 'Bases de Datos'], ...]
+    public static function getTemasDePregunta(int $preguntaId): array
+    {
+        $db   = Database::getConnection();
+        $stmt = $db->prepare("
+            SELECT t.id, t.nombre
+            FROM pregunta_temas pt
+            JOIN temas t ON t.id = pt.tema_id
+            WHERE pt.pregunta_id = :id
+            ORDER BY t.nombre
+        ");
+        $stmt->execute([':id' => $preguntaId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+        // Solo lo hace si la pregunta es del usuario. Devuelve true si se guardó.
+    public static function actualizarPregunta(int $id, int $usuarioId, string $titulo, string $descripcion, array $temasIds): bool
+    {
+        $db = Database::getConnection();
+ 
+        // Comprobar que la pregunta existe y es de este usuario
+        $stmt = $db->prepare("SELECT usuario_id FROM preguntas WHERE id = :id");
+        $stmt->execute([':id' => $id]);
+        $autor = $stmt->fetchColumn();
+ 
+        if ($autor === false || (int) $autor !== $usuarioId) {
+            return false;
+        }
+ 
+        try {
+            // Transacción: o se guarda todo, o no se guarda nada
+            $db->beginTransaction();
+ 
+            // 1. Título y descripción
+            $stmt = $db->prepare("UPDATE preguntas SET titulo = :titulo, descripcion = :descripcion WHERE id = :id");
+            $stmt->execute([':titulo' => $titulo, ':descripcion' => $descripcion, ':id' => $id]);
+ 
+            // 2. Temas: se borran los antiguos y se ponen los nuevos
+            $db->prepare("DELETE FROM pregunta_temas WHERE pregunta_id = :id")->execute([':id' => $id]);
+ 
+            $stmtTema = $db->prepare("INSERT INTO pregunta_temas (pregunta_id, tema_id) VALUES (:pregunta, :tema)");
+            foreach ($temasIds as $temaId) {
+                $stmtTema->execute([':pregunta' => $id, ':tema' => $temaId]);
+            }
+ 
+            $db->commit();
+            return true;
+ 
+        } catch (Throwable $e) {
+            if ($db->inTransaction()) {
+                $db->rollBack();
+            }
+            throw $e;
+        }
+    }
+
+
 
     // Respuestas de una pregunta (las más antiguas primero), con likes y si el usuario dio like
     public static function getRespuestas(int $preguntaId, int $usuarioId): array
