@@ -13,3 +13,6 @@ crearRespuesta: respuesta 16 guardada
 crearRespuesta: respuesta 5 guardada
   autor=100 actor=100
   crearNotificacion ejecutada
+crearRespuesta: respuesta 6 guardada
+  autor=100 actor=100
+  crearNotificacion ejecutada

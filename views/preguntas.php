@@ -2,6 +2,15 @@
 $pagina_activa = 'preguntas';
 $img = 'img/main/';
 
+// Vienen del controlador: $preguntas, $filtro, $busqueda, $orden, $temasSel, $temasDisponibles
+
+// Enlaces de las pestañas TODAS / MIS PREGUNTAS: conservan búsqueda, orden y temas marcados
+$paramsUrl = ['controller' => 'PreguntasController', 'accion' => 'preguntas'];
+if ($busqueda !== '')       $paramsUrl['q'] = $busqueda;
+if ($orden !== 'recientes') $paramsUrl['orden'] = $orden;
+$urlLimpiar = 'index.php?' . http_build_query($paramsUrl + ['filtro' => $filtro]);   // sin temas
+if (!empty($temasSel))      $paramsUrl['temas'] = $temasSel;
+$urlFiltro  = fn($f) => 'index.php?' . http_build_query($paramsUrl + ['filtro' => $f]);
 
 require __DIR__ . '/layout/head.php';
 require __DIR__ . '/layout/sidebar.php';
@@ -29,23 +38,43 @@ require __DIR__ . '/layout/sidebar.php';
 
         <div class="filtros">
             <div class="filtrosBotones">
-                <a href="index.php?controller=PreguntasController&accion=preguntas&filtro=todas"
-                class="pill <?= $filtro === 'todas' ? 'pillActiva' : ''; ?>">TODAS</a>
-                <a href="index.php?controller=PreguntasController&accion=preguntas&filtro=mias"
-                class="pill <?= $filtro === 'mias' ? 'pillActiva' : ''; ?>">MIS PREGUNTAS</a>
+                <a href="<?= htmlspecialchars($urlFiltro('todas')); ?>"
+                   class="pill <?= $filtro === 'todas' ? 'pillActiva' : ''; ?>">TODAS</a>
+                <a href="<?= htmlspecialchars($urlFiltro('mias')); ?>"
+                   class="pill <?= $filtro === 'mias' ? 'pillActiva' : ''; ?>">MIS PREGUNTAS</a>
             </div>
 
-            <select name="orden" class="selectOrden" onchange="this.form.submit()">
-                <option value="recientes"  <?= $orden === 'recientes'  ? 'selected' : ''; ?>>Más recientes</option>
-                <option value="likes"      <?= $orden === 'likes'      ? 'selected' : ''; ?>>Más likes</option>
-                <option value="respuestas" <?= $orden === 'respuestas' ? 'selected' : ''; ?>>Más respuestas</option>
-            </select>
+            <div class="filtrosDerecha">
+                <details class="filtroTemas <?= !empty($temasSel) ? 'conFiltro' : ''; ?>">
+                    <summary>Temas<?= !empty($temasSel) ? ' (' . count($temasSel) . ')' : ''; ?></summary>
+                    <div class="panelTemas">
+                        <?php foreach ($temasDisponibles as $t): ?>
+                            <label class="opcionTema">
+                                <input type="checkbox" name="temas[]" value="<?= (int) $t['id']; ?>"
+                                    <?= in_array((int) $t['id'], $temasSel, true) ? 'checked' : ''; ?>>
+                                <span><?= htmlspecialchars($t['nombre']); ?></span>
+                            </label>
+                        <?php endforeach; ?>
+
+                        <div class="accionesTemas">
+                            <a href="<?= htmlspecialchars($urlLimpiar); ?>">Limpiar</a>
+                            <button type="submit">Aplicar</button>
+                        </div>
+                    </div>
+                </details>
+
+                <select name="orden" class="selectOrden" onchange="this.form.submit()">
+                    <option value="recientes"  <?= $orden === 'recientes'  ? 'selected' : ''; ?>>Más recientes</option>
+                    <option value="likes"      <?= $orden === 'likes'      ? 'selected' : ''; ?>>Más likes</option>
+                    <option value="respuestas" <?= $orden === 'respuestas' ? 'selected' : ''; ?>>Más respuestas</option>
+                </select>
+            </div>
         </div>
     </form>
 
 
     <?php if (empty($preguntas)): ?>
-        <p class="sinResultados">Todavía no hay preguntas.</p>
+        <p class="sinResultados">No hay preguntas que coincidan con esos filtros.</p>
     <?php endif; ?>
 
     <?php foreach ($preguntas as $p): ?>
