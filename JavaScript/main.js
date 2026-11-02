@@ -60,3 +60,10 @@ document.addEventListener('click', async function (e) {
         boton.disabled = false;
     }
 });
+
+// Cierra el panel de "Temas" al hacer clic fuera
+document.addEventListener('click', function (e) {
+    document.querySelectorAll('details.filtroTemas[open]').forEach(function (d) {
+        if (!d.contains(e.target)) d.removeAttribute('open');
+    });
+});

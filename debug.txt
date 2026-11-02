@@ -13,6 +13,7 @@ crearRespuesta: respuesta 16 guardada
 crearRespuesta: respuesta 5 guardada
   autor=100 actor=100
   crearNotificacion ejecutada
+<<<<<<< HEAD
 crearRespuesta: respuesta 19 guardada
   autor=105 actor=100
   crearNotificacion ejecutada
@@ -30,4 +31,8 @@ crearRespuesta: respuesta 23 guardada
   crearNotificacion ejecutada
 crearRespuesta: respuesta 24 guardada
   autor=100 actor=105
+=======
+crearRespuesta: respuesta 6 guardada
+  autor=100 actor=100
+>>>>>>> origin/main
   crearNotificacion ejecutada

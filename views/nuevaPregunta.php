@@ -28,7 +28,7 @@ require __DIR__ . '/layout/sidebar.php';
         Comparte tu duda con el equipo de ingeniería y encuentra soluciones en comunidad.
     </p>
 
-    <form class="formPregunta" method="POST"
+    <form class="formPregunta" method="POST" enctype="multipart/form-data"
           action="index.php?controller=PreguntasController&accion=publicarPregunta">
 
         <?php if (!empty($errores)): ?>
@@ -64,6 +64,21 @@ require __DIR__ . '/layout/sidebar.php';
         </div>
         <p class="ayudaForm">Puedes elegir hasta 3 etiquetas.</p>
 
+        <label>Archivos adjuntos</label>
+        <div class="zonaAdjuntos">
+            <input type="file" id="archivos" name="archivos[]" multiple
+                   accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg,.txt">
+            <svg viewBox="0 0 64 64" width="64" height="64" aria-hidden="true">
+                <path d="M20 44a11 11 0 0 1-1-21.9A14 14 0 0 1 46 24a10 10 0 0 1-1 20"
+                      fill="none" stroke="#3CCBA0" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M32 54V30M24 38l8-8 8 8" fill="none" stroke="#3CCBA0"
+                      stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <p class="zonaTitulo">Arrastra archivos aquí o <span class="enlaceSel">selecciónalos</span></p>
+            <p class="zonaAyuda">PDF, imágenes, documentos, excels...</p>
+            <ul class="listaElegidos"></ul>
+        </div>
+
         <div class="pieForm">
             <p class="avisoForm">Los campos marcados con <span class="obligatorio">*</span> son obligatorios.</p>
 
@@ -83,5 +98,6 @@ require __DIR__ . '/layout/sidebar.php';
 
 </main>
 
+<script src="JavaScript/adjuntos.js"></script>
 </body>
 </html>

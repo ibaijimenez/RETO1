@@ -2,11 +2,13 @@
 $pagina_activa = 'preguntas';
 
 // Valores por si el formulario de respuesta vuelve con errores
-$errores       = $errores       ?? [];
-$contenido     = $contenido     ?? '';
-$respuestas    = $respuestas    ?? [];
-$temasPregunta = $temasPregunta ?? [];
-$esMia         = $esMia         ?? false;
+$errores            = $errores            ?? [];
+$contenido          = $contenido          ?? '';
+$respuestas         = $respuestas         ?? [];
+$temasPregunta      = $temasPregunta      ?? [];
+$esMia              = $esMia              ?? false;
+$adjuntosPregunta   = $adjuntosPregunta   ?? [];
+$adjuntosRespuestas = $adjuntosRespuestas ?? [];
 
 $rutaPreguntas = 'index.php?controller=PreguntasController&accion=preguntas';
 
@@ -20,6 +22,31 @@ if (!function_exists('haceTiempo')) {
         if ($seg < 86400) return 'hace ' . floor($seg / 3600) . ' h';
         $dias = (int) floor($seg / 86400);
         return 'hace ' . $dias . ($dias === 1 ? ' día' : ' días');
+    }
+}
+
+// Lista de archivos adjuntos (de una pregunta o de una respuesta)
+if (!function_exists('pintarAdjuntos')) {
+    function pintarAdjuntos(array $lista): void
+    {
+        if (empty($lista)) return;
+        echo '<ul class="listaAdjuntos">';
+        foreach ($lista as $a) {
+            $url   = htmlspecialchars($a['url']);
+            $esImg = in_array($a['tipo_mime'], ['image/png', 'image/jpeg'], true);
+            $peso  = $a['tamano'] >= 1048576
+                   ? round($a['tamano'] / 1048576, 1) . ' MB'
+                   : max(1, round($a['tamano'] / 1024)) . ' KB';
+
+            echo '<li class="adjunto">';
+            if ($esImg) {
+                echo '<a href="' . $url . '" target="_blank"><img class="adjuntoMiniatura" src="' . $url . '" alt=""></a>';
+            }
+            echo '<a class="adjuntoEnlace" href="' . $url . '"' . ($esImg ? ' target="_blank"' : '') . '>'
+               . htmlspecialchars($a['nombre_original']) . ' <span class="adjuntoTam">(' . $peso . ')</span></a>';
+            echo '</li>';
+        }
+        echo '</ul>';
     }
 }
 
@@ -106,6 +133,14 @@ require __DIR__ . '/layout/sidebar.php';
         <p><?= nl2br(htmlspecialchars($pregunta['descripcion'])); ?></p>
     </section>
 
+    <!-- Archivos adjuntos de la pregunta -->
+    <?php if (!empty($adjuntosPregunta)): ?>
+        <section class="cajaDescripcion">
+            <h2>Archivos adjuntos</h2>
+            <?php pintarAdjuntos($adjuntosPregunta); ?>
+        </section>
+    <?php endif; ?>
+
     <!-- Respuestas -->
     <h2 class="tituloDetalle" id="respuestas">Respuestas (<?= count($respuestas); ?>)</h2>
 
@@ -121,6 +156,12 @@ require __DIR__ . '/layout/sidebar.php';
                 </div>
 
                 <p class="respuestaTexto"><?= nl2br(htmlspecialchars($r['contenido'])); ?></p>
+
+                <?php if (!empty($adjuntosRespuestas[(int) $r['id']])): ?>
+                    <div class="respuestaAdjuntos">
+                        <?php pintarAdjuntos($adjuntosRespuestas[(int) $r['id']]); ?>
+                    </div>
+                <?php endif; ?>
 
                 <div class="respuestaPie">
                     <span class="metaItem">
@@ -138,7 +179,7 @@ require __DIR__ . '/layout/sidebar.php';
     <!-- Escribir respuesta -->
     <h2 class="tituloDetalle">Escribe tu respuesta</h2>
 
-    <form class="formRespuesta" method="POST"
+    <form class="formRespuesta" method="POST" enctype="multipart/form-data"
           action="index.php?controller=PreguntasController&accion=publicarRespuesta">
 
         <?php if (!empty($errores)): ?>
@@ -154,6 +195,13 @@ require __DIR__ . '/layout/sidebar.php';
         <textarea name="contenido" required
                   placeholder="Comparte tu propuesta o solución..."><?= htmlspecialchars($contenido); ?></textarea>
 
+        <div class="zonaAdjuntos zonaCompacta">
+            <input type="file" name="archivos[]" multiple
+                   accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg,.txt">
+            <p class="zonaTitulo">Arrastra archivos aquí o <span class="enlaceSel">selecciónalos</span></p>
+            <ul class="listaElegidos"></ul>
+        </div>
+
         <button type="submit" class="btnPublicar">
             <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true">
                 <path d="M21 3L3 10.5l6.5 2.5L12 20l2.5-6.5L21 3zM9.5 13L21 3"
@@ -166,5 +214,6 @@ require __DIR__ . '/layout/sidebar.php';
 </main>
 
 <script src="JavaScript/detalle.js"></script>
+<script src="JavaScript/adjuntos.js"></script>
 </body>
 </html>

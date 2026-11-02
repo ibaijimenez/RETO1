@@ -47,7 +47,9 @@ public static function create($datos) {
         return $stmt->fetch();
     }
 
-    public static function getPreguntas(int $usuarioId, string $filtro = 'todas', string $busqueda = '', string $orden = 'recientes'): array
+    // $temas: ids de los temas marcados en el filtro. Si hay alguno, salen las preguntas
+    // que tengan AL MENOS UNO, y las que coinciden con más temas salen primero.
+    public static function getPreguntas(int $usuarioId, string $filtro = 'todas', string $busqueda = '', string $orden = 'recientes', array $temas = []): array
     {
         // Lista blanca de ordenaciones (evita inyección SQL)
         $ordenes = [
@@ -56,6 +58,26 @@ public static function create($datos) {
             'respuestas' => 'respuestas DESC',
         ];
         $orderBy = $ordenes[$orden] ?? $ordenes['recientes'];
+
+        // Si hay temas marcados: contamos cuántos de ellos tiene cada pregunta
+        // y las que más coinciden salen primero.
+        $extraSelect = '';
+        $paramsTemas = [];
+        $marcasF = [];
+        if (!empty($temas)) {
+            $marcasC = [];
+            foreach (array_values($temas) as $i => $temaId) {
+                $marcasF[] = ':tf' . $i;
+                $marcasC[] = ':tc' . $i;
+                $paramsTemas[':tf' . $i] = (int) $temaId;
+                $paramsTemas[':tc' . $i] = (int) $temaId;
+            }
+            $extraSelect = ", (SELECT COUNT(*) FROM pregunta_temas ptc
+                                WHERE ptc.pregunta_id = p.id
+                                  AND ptc.tema_id IN (" . implode(',', $marcasC) . ")) AS coincidencias";
+            // Primero las que más temas comparten; el orden elegido desempata
+            $orderBy = 'coincidencias DESC, ' . $orderBy;
+        }
 
         $sql = "
             SELECT p.id, p.titulo, p.fecha_creacion,
@@ -69,12 +91,12 @@ public static function create($datos) {
                 EXISTS(SELECT 1 FROM pregunta_likes l2
                         WHERE l2.pregunta_id = p.id AND l2.usuario_id = :uid_like) AS me_gusta,
                 EXISTS(SELECT 1 FROM preguntas_guardadas g
-                        WHERE g.pregunta_id = p.id AND g.usuario_id = :uid_guard) AS guardada
+                        WHERE g.pregunta_id = p.id AND g.usuario_id = :uid_guard) AS guardada{$extraSelect}
             FROM preguntas p
             JOIN usuarios u ON u.id = p.usuario_id
             WHERE 1 = 1
         ";
-        $params = [':uid_like' => $usuarioId, ':uid_guard' => $usuarioId];
+        $params = [':uid_like' => $usuarioId, ':uid_guard' => $usuarioId] + $paramsTemas;
 
         if ($filtro === 'mias') {
             $sql .= " AND p.usuario_id = :uid_mias";
@@ -89,6 +111,13 @@ public static function create($datos) {
                                 WHERE pt2.pregunta_id = p.id AND t2.nombre LIKE :q3))";
             $like = '%' . $busqueda . '%';
             $params[':q1'] = $params[':q2'] = $params[':q3'] = $like;
+        }
+
+        // Filtro por temas (casillas): al menos uno de los marcados
+        if (!empty($marcasF)) {
+            $sql .= " AND EXISTS (SELECT 1 FROM pregunta_temas ptf
+                                   WHERE ptf.pregunta_id = p.id
+                                     AND ptf.tema_id IN (" . implode(',', $marcasF) . "))";
         }
 
         $sql .= " ORDER BY $orderBy";
@@ -127,7 +156,7 @@ public static function create($datos) {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    // Devuelve todos los temas (para rellenar los desplegables)
+    // Devuelve todos los temas (para rellenar los desplegables y el filtro)
     public static function getTemas(): array
     {
         $db   = Database::getConnection();
@@ -176,7 +205,7 @@ public static function create($datos) {
     }
 
     // Devuelve una pregunta con autor, likes y si el usuario la ha likeado/guardado. null si no existe.
-  public static function getPregunta(int $id, int $usuarioId): ?array
+    public static function getPregunta(int $id, int $usuarioId): ?array
     {
         $sql = "
             SELECT p.id, p.usuario_id, p.titulo, p.descripcion, p.fecha_creacion,
@@ -197,7 +226,7 @@ public static function create($datos) {
         $fila = $stmt->fetch(PDO::FETCH_ASSOC);
         return $fila ?: null;
     }
-    
+
     // Temas de una pregunta: [['id' => 1, 'nombre' => 'Bases de Datos'], ...]
     public static function getTemasDePregunta(int $preguntaId): array
     {
@@ -213,39 +242,39 @@ public static function create($datos) {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-        // Solo lo hace si la pregunta es del usuario. Devuelve true si se guardó.
+    // Solo lo hace si la pregunta es del usuario. Devuelve true si se guardó.
     public static function actualizarPregunta(int $id, int $usuarioId, string $titulo, string $descripcion, array $temasIds): bool
     {
         $db = Database::getConnection();
- 
+
         // Comprobar que la pregunta existe y es de este usuario
         $stmt = $db->prepare("SELECT usuario_id FROM preguntas WHERE id = :id");
         $stmt->execute([':id' => $id]);
         $autor = $stmt->fetchColumn();
- 
+
         if ($autor === false || (int) $autor !== $usuarioId) {
             return false;
         }
- 
+
         try {
             // Transacción: o se guarda todo, o no se guarda nada
             $db->beginTransaction();
- 
+
             // 1. Título y descripción
             $stmt = $db->prepare("UPDATE preguntas SET titulo = :titulo, descripcion = :descripcion WHERE id = :id");
             $stmt->execute([':titulo' => $titulo, ':descripcion' => $descripcion, ':id' => $id]);
- 
+
             // 2. Temas: se borran los antiguos y se ponen los nuevos
             $db->prepare("DELETE FROM pregunta_temas WHERE pregunta_id = :id")->execute([':id' => $id]);
- 
+
             $stmtTema = $db->prepare("INSERT INTO pregunta_temas (pregunta_id, tema_id) VALUES (:pregunta, :tema)");
             foreach ($temasIds as $temaId) {
                 $stmtTema->execute([':pregunta' => $id, ':tema' => $temaId]);
             }
- 
+
             $db->commit();
             return true;
- 
+
         } catch (Throwable $e) {
             if ($db->inTransaction()) {
                 $db->rollBack();
@@ -253,8 +282,6 @@ public static function create($datos) {
             throw $e;
         }
     }
-
-
 
     // Respuestas de una pregunta (las más antiguas primero), con likes y si el usuario dio like
     public static function getRespuestas(int $preguntaId, int $usuarioId): array
@@ -294,8 +321,7 @@ public static function create($datos) {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    // Guarda una respuesta nueva. Devuelve su id.
-          // Guarda una respuesta nueva y avisa al autor de la pregunta. Devuelve el id de la respuesta.
+    // Guarda una respuesta nueva y avisa al autor de la pregunta. Devuelve el id de la respuesta.
     public static function crearRespuesta(int $preguntaId, int $usuarioId, string $contenido): int
     {
         $log = __DIR__ . '/../debug.txt';
@@ -358,7 +384,7 @@ public static function create($datos) {
         }
         $stmt->execute([':id' => $id, ':uid' => $usuarioId]);
 
-               $stmt = $db->prepare("SELECT COUNT(*) FROM $tabla WHERE $col = :id");
+        $stmt = $db->prepare("SELECT COUNT(*) FROM $tabla WHERE $col = :id");
         $stmt->execute([':id' => $id]);
         $total = (int) $stmt->fetchColumn();
 
@@ -384,6 +410,93 @@ public static function create($datos) {
         }
 
         return ['activo' => !$existe, 'total' => $total];
+    }
+
+    // ==================================================================
+    // ADJUNTOS DE RESPUESTAS (tabla adjuntos tal cual)
+    // Los archivos de las PREGUNTAS no usan la base de datos: viven en
+    // uploads/preguntas/<id>/ (los gestiona PreguntasController)
+    // ==================================================================
+
+    public static function crearAdjuntoRespuesta(int $respuestaId, string $nombre, string $ruta, string $mime): int
+    {
+        $db   = Database::getConnection();
+        $stmt = $db->prepare("
+            INSERT INTO adjuntos (respuesta_id, nombre_original, ruta_almacenamiento, tipo_mime)
+            VALUES (:rid, :nombre, :ruta, :mime)
+        ");
+        $stmt->execute([':rid' => $respuestaId, ':nombre' => $nombre, ':ruta' => $ruta, ':mime' => $mime]);
+        return (int) $db->lastInsertId();
+    }
+
+    // Archivos de todas las respuestas de una pregunta
+    public static function getAdjuntosRespuestas(int $preguntaId): array
+    {
+        $db   = Database::getConnection();
+        $stmt = $db->prepare("
+            SELECT a.id, a.respuesta_id, a.nombre_original, a.ruta_almacenamiento, a.tipo_mime
+            FROM adjuntos a
+            JOIN respuestas r ON r.id = a.respuesta_id
+            WHERE r.pregunta_id = :id
+            ORDER BY a.id
+        ");
+        $stmt->execute([':id' => $preguntaId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public static function getAdjunto(int $id): ?array
+    {
+        $db   = Database::getConnection();
+        $stmt = $db->prepare("SELECT * FROM adjuntos WHERE id = :id");
+        $stmt->execute([':id' => $id]);
+        $fila = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $fila ?: null;
+    }
+
+    // Para borrar del disco: las filas de adjuntos se borran solas (ON DELETE CASCADE)
+    private static function rutasAdjuntosPregunta(int $preguntaId): array
+    {
+        $db   = Database::getConnection();
+        $stmt = $db->prepare("
+            SELECT a.ruta_almacenamiento
+            FROM adjuntos a
+            JOIN respuestas r ON r.id = a.respuesta_id
+            WHERE r.pregunta_id = :id
+        ");
+        $stmt->execute([':id' => $preguntaId]);
+        return $stmt->fetchAll(PDO::FETCH_COLUMN);
+    }
+
+    private static function rutasAdjuntosRespuesta(int $respuestaId): array
+    {
+        $db   = Database::getConnection();
+        $stmt = $db->prepare("SELECT ruta_almacenamiento FROM adjuntos WHERE respuesta_id = :id");
+        $stmt->execute([':id' => $respuestaId]);
+        return $stmt->fetchAll(PDO::FETCH_COLUMN);
+    }
+
+    private static function borrarFicheros(array $rutas): void
+    {
+        foreach ($rutas as $ruta) {
+            $archivo = __DIR__ . '/../' . ltrim($ruta, '/\\');
+            if (is_file($archivo)) {
+                @unlink($archivo);
+            }
+        }
+    }
+
+    // Archivos de una pregunta: viven en uploads/preguntas/<id>/
+    private static function borrarCarpetaPregunta(int $preguntaId): void
+    {
+        $dir = __DIR__ . '/../uploads/preguntas/' . $preguntaId;
+        if (is_dir($dir)) {
+            foreach (glob($dir . '/*') ?: [] as $f) {
+                if (is_file($f)) {
+                    @unlink($f);
+                }
+            }
+            @rmdir($dir);
+        }
     }
 
     // ==================================================================
@@ -463,7 +576,8 @@ public static function create($datos) {
         ]);
         return (int) $db->lastInsertId();
     }
-        // ==================================================================
+
+    // ==================================================================
     // ADMIN
     // ==================================================================
 
@@ -494,80 +608,97 @@ public static function getUsuario(int $id): ?array
             ':rol'    => $rol,
         ]);
     }
+
     public static function eliminarPregunta(int $id): ?int
-{
-    $db = Database::getConnection();
+    {
+        $db = Database::getConnection();
 
-    $stmt = $db->prepare("SELECT usuario_id FROM preguntas WHERE id = :id");
-    $stmt->execute([':id' => $id]);
-    $autorId = $stmt->fetchColumn();
-    if ($autorId === false) {
-        return null;
-    }
-
-    try {
-        $db->beginTransaction();
-
-        $db->prepare("DELETE FROM respuesta_likes WHERE respuesta_id IN (SELECT id FROM respuestas WHERE pregunta_id = :id)")
-           ->execute([':id' => $id]);
-        $db->prepare("DELETE FROM respuestas WHERE pregunta_id = :id")->execute([':id' => $id]);
-        $db->prepare("DELETE FROM pregunta_likes WHERE pregunta_id = :id")->execute([':id' => $id]);
-        $db->prepare("DELETE FROM preguntas_guardadas WHERE pregunta_id = :id")->execute([':id' => $id]);
-        $db->prepare("DELETE FROM pregunta_temas WHERE pregunta_id = :id")->execute([':id' => $id]);
-        $db->prepare("DELETE FROM notificaciones WHERE pregunta_id = :id")->execute([':id' => $id]);
-        $db->prepare("DELETE FROM preguntas WHERE id = :id")->execute([':id' => $id]);
-
-        $db->commit();
-        return (int) $autorId;
-    } catch (Throwable $e) {
-        if ($db->inTransaction()) {
-            $db->rollBack();
+        $stmt = $db->prepare("SELECT usuario_id FROM preguntas WHERE id = :id");
+        $stmt->execute([':id' => $id]);
+        $autorId = $stmt->fetchColumn();
+        if ($autorId === false) {
+            return null;
         }
-        throw $e;
-    }
-}
-public static function getRespuestasPorUsuario(int $usuarioId): array
-{
-    $db   = Database::getConnection();
-    $stmt = $db->prepare("
-        SELECT r.id, r.pregunta_id, r.contenido, r.fecha_creacion,
-               p.titulo AS pregunta_titulo,
-               (SELECT COUNT(*) FROM respuesta_likes x WHERE x.respuesta_id = r.id) AS likes
-        FROM respuestas r
-        JOIN preguntas p ON p.id = r.pregunta_id
-        WHERE r.usuario_id = :uid
-        ORDER BY r.fecha_creacion DESC, r.id DESC
-    ");
-    $stmt->execute([':uid' => $usuarioId]);
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
 
-public static function eliminarRespuesta(int $id): ?int
-{
-    $db = Database::getConnection();
+        // Archivos de las respuestas (se borran del disco al terminar)
+        $rutas = self::rutasAdjuntosPregunta($id);
 
-    $stmt = $db->prepare("SELECT usuario_id FROM respuestas WHERE id = :id");
-    $stmt->execute([':id' => $id]);
-    $autorId = $stmt->fetchColumn();
-    if ($autorId === false) {
-        return null;
-    }
+        try {
+            $db->beginTransaction();
 
-    try {
-        $db->beginTransaction();
-        $db->prepare("DELETE FROM respuesta_likes WHERE respuesta_id = :id")->execute([':id' => $id]);
-        $db->prepare("DELETE FROM notificaciones WHERE respuesta_id = :id")->execute([':id' => $id]);
-        $db->prepare("DELETE FROM respuestas WHERE id = :id")->execute([':id' => $id]);
-        $db->commit();
-        return (int) $autorId;
-    } catch (Throwable $e) {
-        if ($db->inTransaction()) {
-            $db->rollBack();
+            $db->prepare("DELETE FROM respuesta_likes WHERE respuesta_id IN (SELECT id FROM respuestas WHERE pregunta_id = :id)")
+               ->execute([':id' => $id]);
+            $db->prepare("DELETE FROM respuestas WHERE pregunta_id = :id")->execute([':id' => $id]);
+            $db->prepare("DELETE FROM pregunta_likes WHERE pregunta_id = :id")->execute([':id' => $id]);
+            $db->prepare("DELETE FROM preguntas_guardadas WHERE pregunta_id = :id")->execute([':id' => $id]);
+            $db->prepare("DELETE FROM pregunta_temas WHERE pregunta_id = :id")->execute([':id' => $id]);
+            $db->prepare("DELETE FROM notificaciones WHERE pregunta_id = :id")->execute([':id' => $id]);
+            $db->prepare("DELETE FROM preguntas WHERE id = :id")->execute([':id' => $id]);
+
+            $db->commit();
+
+            // Ya está borrada de la base de datos: limpiamos los archivos
+            self::borrarFicheros($rutas);
+            self::borrarCarpetaPregunta($id);
+
+            return (int) $autorId;
+        } catch (Throwable $e) {
+            if ($db->inTransaction()) {
+                $db->rollBack();
+            }
+            throw $e;
         }
-        throw $e;
     }
-}
-// ==================================================================
+
+    public static function getRespuestasPorUsuario(int $usuarioId): array
+    {
+        $db   = Database::getConnection();
+        $stmt = $db->prepare("
+            SELECT r.id, r.pregunta_id, r.contenido, r.fecha_creacion,
+                   p.titulo AS pregunta_titulo,
+                   (SELECT COUNT(*) FROM respuesta_likes x WHERE x.respuesta_id = r.id) AS likes
+            FROM respuestas r
+            JOIN preguntas p ON p.id = r.pregunta_id
+            WHERE r.usuario_id = :uid
+            ORDER BY r.fecha_creacion DESC, r.id DESC
+        ");
+        $stmt->execute([':uid' => $usuarioId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public static function eliminarRespuesta(int $id): ?int
+    {
+        $db = Database::getConnection();
+
+        $stmt = $db->prepare("SELECT usuario_id FROM respuestas WHERE id = :id");
+        $stmt->execute([':id' => $id]);
+        $autorId = $stmt->fetchColumn();
+        if ($autorId === false) {
+            return null;
+        }
+
+        // Archivos de la respuesta (se borran del disco al terminar)
+        $rutas = self::rutasAdjuntosRespuesta($id);
+
+        try {
+            $db->beginTransaction();
+            $db->prepare("DELETE FROM respuesta_likes WHERE respuesta_id = :id")->execute([':id' => $id]);
+            $db->prepare("DELETE FROM notificaciones WHERE respuesta_id = :id")->execute([':id' => $id]);
+            $db->prepare("DELETE FROM respuestas WHERE id = :id")->execute([':id' => $id]);
+            $db->commit();
+
+            self::borrarFicheros($rutas);
+
+            return (int) $autorId;
+        } catch (Throwable $e) {
+            if ($db->inTransaction()) {
+                $db->rollBack();
+            }
+            throw $e;
+        }
+    }
+
+    // ==================================================================
     // NOTIFICACIONES
     // ==================================================================
 
@@ -631,6 +762,7 @@ public static function eliminarRespuesta(int $id): ?int
         $stmt = $db->prepare("UPDATE notificaciones SET leida = 1 WHERE usuario_id = :uid AND leida = 0");
         $stmt->execute([':uid' => $usuarioId]);
     }
+<<<<<<< HEAD
     // ==================================================================
     // Usuarios
     // ==================================================================
@@ -648,3 +780,6 @@ public static function cambiarPassword(int $id, string $actual, string $nueva): 
 }
 
 }
+=======
+}
+>>>>>>> origin/main
