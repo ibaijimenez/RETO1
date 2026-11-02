@@ -53,17 +53,16 @@ document.addEventListener('click', async function (e) {
             const contador = boton.parentElement.querySelector('.numLikes');
             if (contador) contador.textContent = resultado.total;
         }
+
+        // Avisa a otras partes de la página (por ejemplo, el perfil quita la tarjeta al dejar de guardar)
+        boton.dispatchEvent(new CustomEvent('alternado', {
+            bubbles: true,
+            detail: { tipo: tipo, activo: resultado.activo }
+        }));
     } catch (err) {
         console.error(err);
         alert('No se ha podido guardar. Inténtalo de nuevo.');
     } finally {
         boton.disabled = false;
     }
-});
-
-// Cierra el panel de "Temas" al hacer clic fuera
-document.addEventListener('click', function (e) {
-    document.querySelectorAll('details.filtroTemas[open]').forEach(function (d) {
-        if (!d.contains(e.target)) d.removeAttribute('open');
-    });
 });

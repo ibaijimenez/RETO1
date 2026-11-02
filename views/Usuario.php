@@ -32,11 +32,11 @@
 
         <div class="datosContador">
             <div class="dato">
-                <span class="numero"><?= count($mis_preguntas); ?></span>
+                <span class="numero" id="contadorPreguntas"><?= count($mis_preguntas); ?></span>
                 <span class="label">Preguntas</span>
             </div>
             <div class="dato">
-                <span class="numero"><?= count($preguntas_guardadas); ?></span>
+                <span class="numero" id="contadorGuardados"><?= count($preguntas_guardadas); ?></span>
                 <span class="label">Guardados</span>
             </div>
         </div>
@@ -49,12 +49,13 @@
     </section>
 
     <div class="listaPreguntas">
+
+        <!-- ================= MIS PREGUNTAS ================= -->
         <div id="preguntas" class="seccionPestana">
-            <?php if (empty($mis_preguntas)): ?>
-                <p class="sinResultados">Todavía no has publicado ninguna pregunta.</p>
-            <?php endif; ?>
+            <p class="sinResultados" <?= empty($mis_preguntas) ? '' : 'style="display:none;"'; ?>>Todavía no has publicado ninguna pregunta.</p>
+
             <?php foreach ($mis_preguntas as $p): ?>
-                <article class="tarjetaPregunta tarjetaFavorito">
+                <article class="tarjetaPregunta tarjetaFavorito" data-id="<?= (int) $p['id']; ?>">
                     <div class="tarjetaCabecera">
                         <h3>
                             <a href="<?= $urlDetalle . (int) $p['id']; ?>"><?= htmlspecialchars($p['titulo']); ?></a>
@@ -75,32 +76,40 @@
                             <span><?= (int) $p['respuestas']; ?> respuestas</span>
                         </div>
                         <div class="datoPie">
-                            <img class="iconoCalendario" src="<?= $img; ?>coraSinRelleno.png" alt="">
-                            <span><?= (int) $p['likes']; ?> likes</span>
+                            <button type="button" class="btnToggle btnLike" data-tipo="like"
+                                    data-id="<?= (int) $p['id']; ?>"
+                                    aria-pressed="<?= !empty($p['me_gusta']) ? 'true' : 'false'; ?>" aria-label="Me gusta">
+                                <img src="<?= $img . (!empty($p['me_gusta']) ? 'coraConRelleno.png' : 'coraSinRelleno.png'); ?>" alt="">
+                            </button>
+                            <span><span class="numLikes"><?= (int) $p['likes']; ?></span> likes</span>
                         </div>
                         <div class="datoPie">
                             <img class="iconoCalendario" src="<?= $img; ?>calendario 1.png" alt="">
                             <span><?= date('d/m/Y', strtotime($p['fecha_creacion'])); ?></span>
                         </div>
-                        <button type="button" class="btnToggle btnEliminar">
-                            <img class="iconoCalendario" src="img/usuario/papelera.png" alt="Eliminar">
+                        <button type="button" class="btnEliminar" data-pregunta="<?= (int) $p['id']; ?>"
+                                title="Eliminar pregunta" aria-label="Eliminar pregunta">
+                            <img src="img/usuario/papelera.png" alt="">
                         </button>
                     </div>
                 </article>
             <?php endforeach; ?>
         </div>
+
+        <!-- ================= GUARDADOS ================= -->
         <div id="guardados" class="seccionPestana" style="display: none;">
-            <?php if (empty($preguntas_guardadas)): ?>
-                <p class="sinResultados">Todavía no has guardado ninguna pregunta.</p>
-            <?php endif; ?>
+            <p class="sinResultados" <?= empty($preguntas_guardadas) ? '' : 'style="display:none;"'; ?>>Todavía no has guardado ninguna pregunta.</p>
+
             <?php foreach ($preguntas_guardadas as $p): ?>
-                <article class="tarjetaPregunta tarjetaFavorito">
+                <article class="tarjetaPregunta tarjetaFavorito" data-id="<?= (int) $p['id']; ?>">
                     <div class="tarjetaCabecera">
                         <h3>
                             <a href="<?= $urlDetalle . (int) $p['id']; ?>"><?= htmlspecialchars($p['titulo']); ?></a>
                         </h3>
-                        <button type="button" class="btnToggle btnGuardar">
-                            <img src="<?= $img; ?>guardadoConRelleno.png" alt="Guardada">
+                        <button type="button" class="btnToggle btnGuardar" data-tipo="guardar"
+                                data-id="<?= (int) $p['id']; ?>" aria-pressed="true"
+                                title="Quitar de guardados" aria-label="Quitar de guardados">
+                            <img src="<?= $img; ?>guardadoConRelleno.png" alt="">
                         </button>
                     </div>
 
@@ -118,8 +127,12 @@
                             <span><?= htmlspecialchars($p['autor']); ?></span>
                         </div>
                         <div class="datoPie">
-                            <img class="iconoCalendario" src="<?= $img; ?>coraSinRelleno.png" alt="">
-                            <span><?= (int) $p['likes']; ?> likes</span>
+                            <button type="button" class="btnToggle btnLike" data-tipo="like"
+                                    data-id="<?= (int) $p['id']; ?>"
+                                    aria-pressed="<?= !empty($p['me_gusta']) ? 'true' : 'false'; ?>" aria-label="Me gusta">
+                                <img src="<?= $img . (!empty($p['me_gusta']) ? 'coraConRelleno.png' : 'coraSinRelleno.png'); ?>" alt="">
+                            </button>
+                            <span><span class="numLikes"><?= (int) $p['likes']; ?></span> likes</span>
                         </div>
                         <div class="datoPie">
                             <img class="iconoCalendario" src="<?= $img; ?>calendario 1.png" alt="">
@@ -129,6 +142,8 @@
                 </article>
             <?php endforeach; ?>
         </div>
+
+        <!-- ================= INFORMACIÓN ================= -->
         <div id="informacion" class="seccionPestana" style="display: none;">
             <div class="formInformacion">
                 <?php foreach ($campos as $titulo => $valor): ?>
@@ -169,6 +184,8 @@
 </main>
 
 <script src="JavaScript/pestanas.js"></script>
+<script src="JavaScript/main.js"></script>
+<script src="JavaScript/perfil.js"></script>
 <script>
     (function () {
         var nueva = document.getElementById('nueva');

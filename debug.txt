@@ -36,3 +36,6 @@ crearRespuesta: respuesta 6 guardada
   autor=100 actor=100
 >>>>>>> origin/main
   crearNotificacion ejecutada
+crearRespuesta: respuesta 25 guardada
+  autor=100 actor=100
+  crearNotificacion ejecutada

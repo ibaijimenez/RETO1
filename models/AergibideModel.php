@@ -762,7 +762,6 @@ public static function getUsuario(int $id): ?array
         $stmt = $db->prepare("UPDATE notificaciones SET leida = 1 WHERE usuario_id = :uid AND leida = 0");
         $stmt->execute([':uid' => $usuarioId]);
     }
-<<<<<<< HEAD
     // ==================================================================
     // Usuarios
     // ==================================================================
@@ -780,6 +779,3 @@ public static function cambiarPassword(int $id, string $actual, string $nueva): 
 }
 
 }
-=======
-}
->>>>>>> origin/main
