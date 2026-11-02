@@ -55,4 +55,41 @@ class UsuarioController extends BaseController {
         header('Location: index.php?controller=UsuarioController&accion=perfil');
         exit;
     }
+
+    // Borra una pregunta del propio usuario. Lo llama JavaScript (fetch) y responde en JSON.
+    public function eliminarPregunta() {
+        header('Content-Type: application/json; charset=utf-8');
+
+        if (empty($_SESSION['usuario_id'])) {
+            http_response_code(401);
+            echo json_encode(['error' => 'Sesión no iniciada']);
+            exit;
+        }
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            http_response_code(405);
+            echo json_encode(['error' => 'Método no permitido']);
+            exit;
+        }
+
+        $uid = (int) $_SESSION['usuario_id'];
+        $id  = (int) ($_POST['id'] ?? 0);
+
+        // Solo se puede borrar una pregunta que sea tuya
+        $pregunta = AergibideModel::getPregunta($id, $uid);
+        if ($pregunta === null || (int) $pregunta['usuario_id'] !== $uid) {
+            http_response_code(403);
+            echo json_encode(['error' => 'No puedes borrar esta pregunta']);
+            exit;
+        }
+
+        try {
+            AergibideModel::eliminarPregunta($id);
+            echo json_encode(['ok' => true]);
+        } catch (Throwable $e) {
+            http_response_code(500);
+            echo json_encode(['error' => 'No se ha podido borrar']);
+            // Para depurar: echo json_encode(['error' => $e->getMessage()]);
+        }
+        exit;
+    }
 }
