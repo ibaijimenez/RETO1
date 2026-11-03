@@ -542,44 +542,55 @@ public static function getUsuario(int $id): ?array
         ]);
     }
 
-    public static function eliminarPregunta(int $id): ?int
-    {
-        $db = Database::getConnection();
+public static function eliminarPregunta(int $id): ?int
+{
+    $db = Database::getConnection();
 
-        $stmt = $db->prepare("SELECT usuario_id FROM preguntas WHERE id = :id");
-        $stmt->execute([':id' => $id]);
-        $autorId = $stmt->fetchColumn();
-        if ($autorId === false) {
-            return null;
-        }
-
-        $rutas = self::rutasAdjuntosPregunta($id);
-
-        try {
-            $db->beginTransaction();
-
-            $db->prepare("DELETE FROM respuesta_likes WHERE respuesta_id IN (SELECT id FROM respuestas WHERE pregunta_id = :id)")
-               ->execute([':id' => $id]);
-            $db->prepare("DELETE FROM respuestas WHERE pregunta_id = :id")->execute([':id' => $id]);
-            $db->prepare("DELETE FROM pregunta_likes WHERE pregunta_id = :id")->execute([':id' => $id]);
-            $db->prepare("DELETE FROM preguntas_guardadas WHERE pregunta_id = :id")->execute([':id' => $id]);
-            $db->prepare("DELETE FROM pregunta_temas WHERE pregunta_id = :id")->execute([':id' => $id]);
-            $db->prepare("DELETE FROM notificaciones WHERE pregunta_id = :id")->execute([':id' => $id]);
-            $db->prepare("DELETE FROM preguntas WHERE id = :id")->execute([':id' => $id]);
-
-            $db->commit();
-            self::borrarFicheros($rutas);
-            self::borrarCarpetaPregunta($id);
-
-            return (int) $autorId;
-        } catch (Throwable $e) {
-            if ($db->inTransaction()) {
-                $db->rollBack();
-            }
-            throw $e;
-        }
+    // Comprobar que la pregunta existe y saber quién es el autor
+    $stmt = $db->prepare("SELECT usuario_id FROM preguntas WHERE id = :id");
+    $stmt->execute([':id' => $id]);
+    $autorId = $stmt->fetchColumn();
+    if ($autorId === false) {
+        return null;
     }
 
+    // Rutas de los archivos de las respuestas (se borran del disco al terminar)
+    $rutas = self::rutasAdjuntosPregunta($id);
+
+    try {
+        $db->beginTransaction();
+
+        // 1. Primero las notificaciones (apuntan a la pregunta y a las respuestas)
+        $db->prepare("DELETE FROM notificaciones WHERE pregunta_id = :id")->execute([':id' => $id]);
+
+        // 2. Likes de las respuestas y las respuestas
+        $db->prepare("DELETE FROM respuesta_likes WHERE respuesta_id IN (SELECT id FROM respuestas WHERE pregunta_id = :id)")
+           ->execute([':id' => $id]);
+        $db->prepare("DELETE FROM respuestas WHERE pregunta_id = :id")->execute([':id' => $id]);
+
+        // 3. Lo que cuelga de la pregunta
+        $db->prepare("DELETE FROM pregunta_likes WHERE pregunta_id = :id")->execute([':id' => $id]);
+        $db->prepare("DELETE FROM preguntas_guardadas WHERE pregunta_id = :id")->execute([':id' => $id]);
+        $db->prepare("DELETE FROM pregunta_temas WHERE pregunta_id = :id")->execute([':id' => $id]);
+
+        // 4. Y por último la pregunta
+        $db->prepare("DELETE FROM preguntas WHERE id = :id")->execute([':id' => $id]);
+
+        $db->commit();
+
+        // Ya está borrada de la base de datos: limpiamos los archivos del disco
+        self::borrarFicheros($rutas);
+        self::borrarCarpetaPregunta($id);
+
+        return (int) $autorId;
+
+    } catch (Throwable $e) {
+        if ($db->inTransaction()) {
+            $db->rollBack();
+        }
+        throw $e;
+    }
+}
     public static function getRespuestasPorUsuario(int $usuarioId): array
     {
         $db   = Database::getConnection();
