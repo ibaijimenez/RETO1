@@ -47,11 +47,8 @@ public static function create($datos) {
         return $stmt->fetch();
     }
 
-    // $temas: ids de los temas marcados en el filtro. Si hay alguno, salen las preguntas
-    // que tengan AL MENOS UNO, y las que coinciden con más temas salen primero.
     public static function getPreguntas(int $usuarioId, string $filtro = 'todas', string $busqueda = '', string $orden = 'recientes', array $temas = []): array
     {
-        // Lista blanca de ordenaciones (evita inyección SQL)
         $ordenes = [
             'recientes'  => 'p.fecha_creacion DESC, p.id DESC',
             'likes'      => 'likes DESC',
@@ -59,8 +56,6 @@ public static function create($datos) {
         ];
         $orderBy = $ordenes[$orden] ?? $ordenes['recientes'];
 
-        // Si hay temas marcados: contamos cuántos de ellos tiene cada pregunta
-        // y las que más coinciden salen primero.
         $extraSelect = '';
         $paramsTemas = [];
         $marcasF = [];
@@ -113,7 +108,6 @@ public static function create($datos) {
             $params[':q1'] = $params[':q2'] = $params[':q3'] = $like;
         }
 
-        // Filtro por temas (casillas): al menos uno de los marcados
         if (!empty($marcasF)) {
             $sql .= " AND EXISTS (SELECT 1 FROM pregunta_temas ptf
                                    WHERE ptf.pregunta_id = p.id
@@ -125,12 +119,11 @@ public static function create($datos) {
         $db   = Database::getConnection();
         $stmt = $db->prepare($sql);
         $stmt->execute($params);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);   // array asociativo, como usa la vista
+        return $stmt->fetchAll(PDO::FETCH_ASSOC); 
     }
 
     public static function getPreguntasMasLikes(?int $limite = null): array
     {
-        // pregunta_likes no tiene columna "id": se cuenta por usuario_id
         $sql = "
             SELECT
                 p.id,
@@ -156,7 +149,6 @@ public static function create($datos) {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    // Devuelve todos los temas (para rellenar los desplegables y el filtro)
     public static function getTemas(): array
     {
         $db   = Database::getConnection();
@@ -164,16 +156,13 @@ public static function create($datos) {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    // Guarda una pregunta nueva y sus temas. Devuelve el id de la pregunta.
     public static function crearPregunta(int $usuarioId, string $titulo, string $descripcion, array $temasIds): int
     {
         $db = Database::getConnection();
 
         try {
-            // Transacción: o se guarda todo, o no se guarda nada
+            // transacción: o se guarda todo, o no se guarda nada
             $db->beginTransaction();
-
-            // 1. La pregunta
             $stmt = $db->prepare(
                 "INSERT INTO preguntas (usuario_id, titulo, descripcion)
                  VALUES (:uid, :titulo, :descripcion)"
@@ -184,8 +173,6 @@ public static function create($datos) {
                 ':descripcion' => $descripcion,
             ]);
             $preguntaId = (int) $db->lastInsertId();
-
-            // 2. Sus temas (tabla intermedia)
             $stmtTema = $db->prepare(
                 "INSERT INTO pregunta_temas (pregunta_id, tema_id) VALUES (:pregunta, :tema)"
             );
@@ -203,8 +190,6 @@ public static function create($datos) {
             throw $e;
         }
     }
-
-    // Devuelve una pregunta con autor, likes y si el usuario la ha likeado/guardado. null si no existe.
     public static function getPregunta(int $id, int $usuarioId): ?array
     {
         $sql = "
@@ -227,7 +212,6 @@ public static function create($datos) {
         return $fila ?: null;
     }
 
-    // Temas de una pregunta: [['id' => 1, 'nombre' => 'Bases de Datos'], ...]
     public static function getTemasDePregunta(int $preguntaId): array
     {
         $db   = Database::getConnection();
@@ -241,13 +225,9 @@ public static function create($datos) {
         $stmt->execute([':id' => $preguntaId]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-
-    // Solo lo hace si la pregunta es del usuario. Devuelve true si se guardó.
     public static function actualizarPregunta(int $id, int $usuarioId, string $titulo, string $descripcion, array $temasIds): bool
     {
         $db = Database::getConnection();
-
-        // Comprobar que la pregunta existe y es de este usuario
         $stmt = $db->prepare("SELECT usuario_id FROM preguntas WHERE id = :id");
         $stmt->execute([':id' => $id]);
         $autor = $stmt->fetchColumn();
@@ -257,14 +237,9 @@ public static function create($datos) {
         }
 
         try {
-            // Transacción: o se guarda todo, o no se guarda nada
             $db->beginTransaction();
-
-            // 1. Título y descripción
             $stmt = $db->prepare("UPDATE preguntas SET titulo = :titulo, descripcion = :descripcion WHERE id = :id");
             $stmt->execute([':titulo' => $titulo, ':descripcion' => $descripcion, ':id' => $id]);
-
-            // 2. Temas: se borran los antiguos y se ponen los nuevos
             $db->prepare("DELETE FROM pregunta_temas WHERE pregunta_id = :id")->execute([':id' => $id]);
 
             $stmtTema = $db->prepare("INSERT INTO pregunta_temas (pregunta_id, tema_id) VALUES (:pregunta, :tema)");
@@ -282,8 +257,6 @@ public static function create($datos) {
             throw $e;
         }
     }
-
-    // Respuestas de una pregunta (las más antiguas primero), con likes y si el usuario dio like
     public static function getRespuestas(int $preguntaId, int $usuarioId): array
     {
         $db   = Database::getConnection();
@@ -301,7 +274,6 @@ public static function create($datos) {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    // Respuestas a las que el usuario ha dado like (para Favoritos)
     public static function getRespuestasFavoritas(int $usuarioId): array
     {
         $db   = Database::getConnection();
@@ -320,8 +292,6 @@ public static function create($datos) {
         $stmt->execute([':uid' => $usuarioId]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-
-    // Guarda una respuesta nueva y avisa al autor de la pregunta. Devuelve el id de la respuesta.
     public static function crearRespuesta(int $preguntaId, int $usuarioId, string $contenido): int
     {
         $log = __DIR__ . '/../debug.txt';
@@ -335,8 +305,6 @@ public static function create($datos) {
         $respuestaId = (int) $db->lastInsertId();
 
         file_put_contents($log, "crearRespuesta: respuesta $respuestaId guardada\n", FILE_APPEND);
-
-        // Avisar al autor de la pregunta
         try {
             $stmt = $db->prepare("SELECT usuario_id FROM preguntas WHERE id = :id");
             $stmt->execute([':id' => $preguntaId]);
@@ -355,9 +323,6 @@ public static function create($datos) {
 
         return $respuestaId;
     }
-
-    // Activa o desactiva un like / guardado. Devuelve el nuevo estado y el total.
-    // $tipo sale de una lista blanca, así que las tablas nunca vienen del usuario.
     public static function alternar(string $tipo, int $id, int $usuarioId): array
     {
         $config = [
@@ -387,8 +352,6 @@ public static function create($datos) {
         $stmt = $db->prepare("SELECT COUNT(*) FROM $tabla WHERE $col = :id");
         $stmt->execute([':id' => $id]);
         $total = (int) $stmt->fetchColumn();
-
-        // Solo notificamos al ACTIVAR un like (no al quitarlo ni al guardar)
         if (!$existe) {
             $quien = self::nombreUsuario($usuarioId);
 
@@ -411,13 +374,6 @@ public static function create($datos) {
 
         return ['activo' => !$existe, 'total' => $total];
     }
-
-    // ==================================================================
-    // ADJUNTOS DE RESPUESTAS (tabla adjuntos tal cual)
-    // Los archivos de las PREGUNTAS no usan la base de datos: viven en
-    // uploads/preguntas/<id>/ (los gestiona PreguntasController)
-    // ==================================================================
-
     public static function crearAdjuntoRespuesta(int $respuestaId, string $nombre, string $ruta, string $mime): int
     {
         $db   = Database::getConnection();
@@ -428,8 +384,6 @@ public static function create($datos) {
         $stmt->execute([':rid' => $respuestaId, ':nombre' => $nombre, ':ruta' => $ruta, ':mime' => $mime]);
         return (int) $db->lastInsertId();
     }
-
-    // Archivos de todas las respuestas de una pregunta
     public static function getAdjuntosRespuestas(int $preguntaId): array
     {
         $db   = Database::getConnection();
@@ -452,8 +406,6 @@ public static function create($datos) {
         $fila = $stmt->fetch(PDO::FETCH_ASSOC);
         return $fila ?: null;
     }
-
-    // Para borrar del disco: las filas de adjuntos se borran solas (ON DELETE CASCADE)
     private static function rutasAdjuntosPregunta(int $preguntaId): array
     {
         $db   = Database::getConnection();
@@ -484,8 +436,6 @@ public static function create($datos) {
             }
         }
     }
-
-    // Archivos de una pregunta: viven en uploads/preguntas/<id>/
     private static function borrarCarpetaPregunta(int $preguntaId): void
     {
         $dir = __DIR__ . '/../uploads/preguntas/' . $preguntaId;
@@ -498,12 +448,6 @@ public static function create($datos) {
             @rmdir($dir);
         }
     }
-
-    // ==================================================================
-    // DOCUMENTOS
-    // ==================================================================
-
-    // Lista de documentos. Se puede filtrar por categoría y limitar cuántos salen.
     public static function getDocumentos(string $categoria = '', ?int $limite = null): array
     {
         $sql = "
@@ -532,8 +476,6 @@ public static function create($datos) {
         $stmt->execute($params);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-
-    // Cuántos documentos hay en cada categoría. Devuelve ['Manuales' => 3, ...]
     public static function getConteoCategorias(): array
     {
         $db   = Database::getConnection();
@@ -545,8 +487,6 @@ public static function create($datos) {
         }
         return $conteos;
     }
-
-    // Devuelve un documento por su id (o null si no existe)
     public static function getDocumento(int $id): ?array
     {
         $db   = Database::getConnection();
@@ -555,8 +495,6 @@ public static function create($datos) {
         $fila = $stmt->fetch(PDO::FETCH_ASSOC);
         return $fila ?: null;
     }
-
-    // Guarda los datos de un documento ya subido. Devuelve su id.
     public static function crearDocumento(int $usuarioId, string $categoria, string $titulo, string $descripcion,
                                           string $nombreArchivo, string $ruta, string $tipoMime): int
     {
@@ -576,11 +514,6 @@ public static function create($datos) {
         ]);
         return (int) $db->lastInsertId();
     }
-
-    // ==================================================================
-    // ADMIN
-    // ==================================================================
-
     public static function getUsuarios(): array
     {
         $db   = Database::getConnection();
@@ -620,7 +553,6 @@ public static function getUsuario(int $id): ?array
             return null;
         }
 
-        // Archivos de las respuestas (se borran del disco al terminar)
         $rutas = self::rutasAdjuntosPregunta($id);
 
         try {
@@ -636,8 +568,6 @@ public static function getUsuario(int $id): ?array
             $db->prepare("DELETE FROM preguntas WHERE id = :id")->execute([':id' => $id]);
 
             $db->commit();
-
-            // Ya está borrada de la base de datos: limpiamos los archivos
             self::borrarFicheros($rutas);
             self::borrarCarpetaPregunta($id);
 
@@ -676,8 +606,6 @@ public static function getUsuario(int $id): ?array
         if ($autorId === false) {
             return null;
         }
-
-        // Archivos de la respuesta (se borran del disco al terminar)
         $rutas = self::rutasAdjuntosRespuesta($id);
 
         try {
@@ -697,11 +625,6 @@ public static function getUsuario(int $id): ?array
             throw $e;
         }
     }
-
-    // ==================================================================
-    // NOTIFICACIONES
-    // ==================================================================
-
     private static function crearNotificacion(int $destino, int $actor, string $mensaje, int $preguntaId, ?int $respuestaId = null): void
     {
         if ($destino === $actor) {
@@ -762,9 +685,7 @@ public static function getUsuario(int $id): ?array
         $stmt = $db->prepare("UPDATE notificaciones SET leida = 1 WHERE usuario_id = :uid AND leida = 0");
         $stmt->execute([':uid' => $usuarioId]);
     }
-    // ==================================================================
-    // Usuarios
-    // ==================================================================
+
 public static function cambiarPassword(int $id, string $actual, string $nueva): bool
 {
     $db   = Database::getConnection();

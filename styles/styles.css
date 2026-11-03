@@ -2238,18 +2238,25 @@ button.btnNuevaPregunta {
 }
 
 /* Nombres de los archivos elegidos */
-.listaAdjuntos {
+/* Archivos ya subidos (editar pregunta) y nombres de los recién elegidos */
+.listaAdjuntos,
+.listaElegidos {
     list-style: none;
     padding: 0;
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
     gap: 8px;
+}
+
+/* Los recién elegidos van dentro de la zona de arrastrar: no deben captar el clic */
+.listaElegidos {
+    justify-content: center;
     margin-top: 8px;
     pointer-events: none;
 }
 
-.listaAdjuntos li {
+.listaAdjuntos li,
+.listaElegidos li {
     background-color: white;
     color: #00A67E;
     font-size: 15px;
@@ -2257,6 +2264,42 @@ button.btnNuevaPregunta {
     padding: 4px 14px;
     border-radius: 20px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.18);
+}
+
+/* Archivos actuales: nombre + casilla "Quitar" */
+.adjunto {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.adjuntoEnlace {
+    color: #00A67E;
+    text-decoration: none;
+}
+
+.adjuntoEnlace:hover {
+    text-decoration: underline;
+}
+
+.adjunto input[type="checkbox"] {
+    accent-color: #E00000;
+    cursor: pointer;
+}
+
+/* Al marcar "Quitar", la etiqueta se pone roja y tachada para que se vea que se va a borrar */
+.adjunto:has(input:checked) {
+    background-color: #FDECEC;
+}
+
+.adjunto:has(input:checked) .adjuntoEnlace {
+    color: #9B1C1C;
+    text-decoration: line-through;
+}
+
+.enlaceSel {
+    color: #00A67E;
+    text-decoration: underline;
 }
 /* Adjuntos dentro del formulario de respuesta */
 .formRespuesta .zonaAdjuntos {
@@ -2273,4 +2316,53 @@ button.btnNuevaPregunta {
 
 .formRespuesta .zonaTitulo {
     font-size: 18px;
+}
+
+/* ==========================================================================
+   ADJUNTOS EN EL DETALLE (preguntas y respuestas)
+   ========================================================================== */
+
+/* Miniatura de las imágenes: pequeña, sin deformarse */
+.adjuntoMiniatura {
+    display: block;
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 160px;
+    object-fit: contain;
+    border-radius: 10px;
+    border: 1px solid #E5E7EB;
+    background-color: white;
+}
+
+/* Adjunto con imagen: tarjeta con la miniatura arriba y el nombre debajo */
+.listaAdjuntos .adjunto:has(.adjuntoMiniatura) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 8px;
+    max-width: 240px;
+    border-radius: 14px;
+}
+
+/* Peso del archivo: "(120 KB)" en gris y sin negrita */
+.adjuntoTam {
+    color: #9CA3AF;
+    font-weight: 400;
+    font-size: 14px;
+}
+
+/* Archivos de cada respuesta: alineados con el texto de la respuesta */
+.respuestaAdjuntos {
+    margin: 12px 0 0 64px;
+}
+
+/* Zona de arrastrar compacta del formulario de respuesta */
+.formRespuesta .zonaCompacta {
+    padding: 16px;
+    gap: 4px;
+}
+
+@media (max-width: 900px) {
+    .respuestaAdjuntos { margin-left: 0; }
 }
