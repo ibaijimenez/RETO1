@@ -2,7 +2,7 @@
 require_once __DIR__ . '/BaseController.php';
 require_once __DIR__ . '/../models/AergibideModel.php';
 
-class UsuarioController extends BaseController {
+class usuarioController extends BaseController {
 
     public function perfil() {
         $this->comprobarSesion();
@@ -28,7 +28,7 @@ class UsuarioController extends BaseController {
         $this->comprobarSesion();
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header('Location: index.php?controller=UsuarioController&accion=perfil');
+            header('Location: index.php?controller=usuarioController&accion=perfil');
             exit;
         }
 
@@ -52,7 +52,7 @@ class UsuarioController extends BaseController {
         }
 
         $_SESSION['perfil_msg'] = $msg;
-        header('Location: index.php?controller=UsuarioController&accion=perfil');
+        header('Location: index.php?controller=usuarioController&accion=perfil');
         exit;
     }
 

@@ -22,7 +22,7 @@
 
                 <h3 class="bienvenida">CREA TU CUENTA</h3>
 
-                <h1>REGISTRARSE</h1>
+                <h1>HOLA BUENOS DÍAS</h1>
 
                 <p class="descripcionLogin">
                     Completa los datos para empezar a utilizar la

@@ -29,7 +29,7 @@ document.addEventListener('click', async function (e) {
         const datos = new FormData();
         datos.append('id', id);
 
-        const respuesta = await fetch('index.php?controller=UsuarioController&accion=eliminarPregunta', {
+        const respuesta = await fetch('index.php?controller=usuarioController&accion=eliminarPregunta', {
             method: 'POST',
             body: datos
         });
