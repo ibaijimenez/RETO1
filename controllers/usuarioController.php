@@ -87,8 +87,7 @@ class usuarioController extends BaseController {
             echo json_encode(['ok' => true]);
         } catch (Throwable $e) {
             http_response_code(500);
-            echo json_encode(['error' => 'No se ha podido borrar']);
-            // Para depurar: echo json_encode(['error' => $e->getMessage()]);
+            echo json_encode(['error' => $e->getMessage()]);   // temporal: para ver el fallo real
         }
         exit;
     }

@@ -16,6 +16,7 @@ function quitarTarjeta(tarjeta) {
 }
 
 // 1. Papelera: borrar una pregunta propia
+// 1. Papelera: borrar una pregunta propia
 document.addEventListener('click', async function (e) {
     const boton = e.target.closest('.btnEliminar');
     if (!boton || boton.disabled) return;
@@ -38,14 +39,17 @@ document.addEventListener('click', async function (e) {
             window.location.href = 'index.php';
             return;
         }
-        if (!respuesta.ok) throw new Error('Error del servidor');
+        if (!respuesta.ok) {
+            const error = await respuesta.json();
+            throw new Error(error.error || 'Error del servidor');
+        }
 
         // Fuera la tarjeta (y la copia que pueda haber en Guardados)
         document.querySelectorAll('.tarjetaPregunta[data-id="' + id + '"]').forEach(quitarTarjeta);
 
     } catch (err) {
         console.error(err);
-        alert('No se ha podido eliminar. Inténtalo de nuevo.');
+        alert('No se ha podido eliminar: ' + err.message);
         boton.disabled = false;
     }
 });
